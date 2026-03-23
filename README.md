@@ -95,4 +95,4 @@ pnpm drizzle-kit push    # 同步 schema 到 PostgreSQL
 
 ## License
 
-Private — Kevv AI
+MIT — [Kevv AI Labs](https://github.com/Kevv-AI-Labs-Inc)
