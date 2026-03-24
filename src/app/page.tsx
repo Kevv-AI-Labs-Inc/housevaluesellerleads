@@ -11,7 +11,6 @@ import {
   Building2,
   BarChart3,
   GraduationCap,
-  MessageCircle,
   X,
   Loader2,
   CheckCircle2,
@@ -24,6 +23,7 @@ import { LeadGate } from "@/components/LeadGate";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { ShareButtons } from "@/components/ShareButtons";
 import { PricingCTA } from "@/components/PricingCTA";
+import { AgentCTA } from "@/components/AgentCTA";
 
 interface ValuationData {
   estimatedValueLow: number;
@@ -59,7 +59,6 @@ export default function HomePage() {
   const [viewState, setViewState] = useState<ViewState>("input");
   const [valuation, setValuation] = useState<ValuationData | null>(null);
   const [submittedAddress, setSubmittedAddress] = useState("");
-  const [showChat, setShowChat] = useState(false);
   const [error, setError] = useState("");
   const [agentSlug, setAgentSlug] = useState("");
   const abortRef = useRef<AbortController | null>(null);
@@ -127,8 +126,6 @@ export default function HomePage() {
 
   const handleLeadCaptured = () => {
     setViewState("report");
-    // Show chat widget after a delay
-    setTimeout(() => setShowChat(true), 3000);
   };
 
   const formatPrice = (price: number) => {
@@ -150,7 +147,6 @@ export default function HomePage() {
     setViewState("input");
     setAddress("");
     setValuation(null);
-    setShowChat(false);
   };
 
   return (
@@ -613,33 +609,16 @@ export default function HomePage() {
         </footer>
       </main>
 
-      {/* AI Chat Widget */}
-      <AnimatePresence>
-        {showChat && viewState === "report" && (
-          <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.9 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.9 }}
-            className="chat-widget"
-          >
-            <div className="relative">
-              <button
-                onClick={() => setShowChat(false)}
-                className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-400 hover:text-white transition-colors"
-              >
-                <X size={12} />
-              </button>
-              <div className="chat-bubble">
-                <div className="flex items-center gap-2 mb-1">
-                  <MessageCircle size={14} />
-                  <span className="font-semibold">{t("chat.title")}</span>
-                </div>
-                <p>{t("chat.message")}</p>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Agent CTA — floating action button */}
+      {viewState === "report" && (
+        <AgentCTA
+          agentSlug={agentSlug}
+          address={submittedAddress}
+          estimatedValue={
+            valuation ? formatFullPrice(valuation.estimatedValue) : undefined
+          }
+        />
+      )}
     </div>
   );
 }

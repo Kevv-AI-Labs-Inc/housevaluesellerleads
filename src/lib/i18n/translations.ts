@@ -253,14 +253,62 @@ export const translations = {
     en: "WeChat",
   },
 
-  // ─── Chat Widget ───────────────────────────────────────
-  "chat.title": {
-    zh: "AI 助手",
-    en: "AI Assistant",
+  // ─── Agent CTA ─────────────────────────────────────────
+  "agent.linked.title": {
+    zh: "您的专属经纪人",
+    en: "Your Dedicated Agent",
   },
-  "chat.message": {
-    zh: "对估价结果有疑问？需要具体聊聊您的房子吗？💬",
-    en: "Have questions about the valuation? Want to discuss your property? 💬",
+  "agent.linked.subtitle": {
+    zh: "已收到您的估价报告，随时为您服务",
+    en: "Has received your valuation, ready to help",
+  },
+  "agent.generic.title": {
+    zh: "联系当地专家",
+    en: "Talk to a Local Expert",
+  },
+  "agent.generic.subtitle": {
+    zh: "免费咨询，无任何义务",
+    en: "Free consultation, no obligation",
+  },
+  "agent.about": {
+    zh: "关于",
+    en: "Regarding",
+  },
+  "agent.action.call": {
+    zh: "立即通话",
+    en: "Call Now",
+  },
+  "agent.action.schedule": {
+    zh: "预约回电",
+    en: "Schedule Call",
+  },
+  "agent.schedule.name": {
+    zh: "您的姓名",
+    en: "Your name",
+  },
+  "agent.schedule.phone": {
+    zh: "您的手机号",
+    en: "Your phone number",
+  },
+  "agent.schedule.time": {
+    zh: "选择回电时间",
+    en: "Preferred time",
+  },
+  "agent.schedule.submit": {
+    zh: "确认预约",
+    en: "Confirm",
+  },
+  "agent.schedule.confirmed": {
+    zh: "预约成功！🎉",
+    en: "Scheduled! 🎉",
+  },
+  "agent.schedule.confirmedSub": {
+    zh: "经纪人将在您选择的时间段联系您",
+    en: "An agent will reach out during your preferred time",
+  },
+  "agent.cta.teaser": {
+    zh: "或预约一个方便的时间",
+    en: "Or schedule a convenient time",
   },
 
   // ─── Pricing CTA ───────────────────────────────────────
