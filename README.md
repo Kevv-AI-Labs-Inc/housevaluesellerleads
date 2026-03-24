@@ -4,20 +4,28 @@
 [![Next.js 16](https://img.shields.io/badge/Next.js-16-black?logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 
-> **为房产经纪人打造的 AI 免费估价工具，精准捕获 Seller Leads。**
+> **AI-powered free home valuation tool for real estate agents — capture Seller Leads at scale.**
 >
-> 用户输入地址 → AI 实时分析公开房产数据 → 生成专业估价报告 → 邮箱捕获转化为 Lead。
-> 每次估值成本仅 ~$0.01，对比竞品 $400–1,000/月的订阅费，降本 99%。
+> 为房产经纪人打造的 AI 免费估价工具，精准捕获 Seller Leads。
+>
+> User enters address → AI analyzes public data → Gated report captures email & phone → Agent notified instantly.
+> Cost per valuation: ~$0.01 vs competitors at $400–1,000/mo. **99% cost reduction.**
 
 ---
 
-## ✨ 核心功能
+## ✨ Features
 
-- 🔍 **AI 实时估值** — Tavily 搜索 Zillow/Redfin/公共记录 + GPT-4o 智能分析，60 秒出报告
-- 📊 **专业报告** — 房屋详情 / 成交对比 (Comps) / 学区评分 / 市场趋势，一键生成
-- 📧 **Lead 自动捕获** — 邮箱收集 → PostgreSQL 存储，经纪人后台即时查看
-- 💬 **AI Chat Widget** — 估值完成后弹出智能对话提示，引导用户深度互动
-- 🌙 **Glassmorphism 暗色主题** — 动画驱动的沉浸式 UI，提升品牌质感
+- 🌐 **Bilingual (EN/中文)** — Native i18n with browser auto-detection and one-click toggle
+- 🔍 **AI Real-time Valuation** — Tavily searches Zillow/Redfin/public records + GPT-4o analysis, results in 60s
+- 📊 **Professional Report** — Property details, comparable sales, school ratings, market trends
+- 🔒 **Lead Gate** — Email + phone required before revealing full report (blurred value preview as teaser)
+- 📍 **Google Places Autocomplete** — Standardized US address input, reducing drop-off
+- 📲 **Agent Attribution** — `?agent=xxx` URL param tracks lead ownership per agent
+- 🔔 **Real-time Notifications** — Email (via Resend) + Webhook alerts when a new lead is captured
+- 🔗 **Social Sharing** — WhatsApp, Facebook, Twitter/X, WeChat, Copy Link — with viral attribution
+- 💰 **Pricing CTA** — Agent subscription upsell built into every report
+- 💬 **AI Chat Widget** — Post-valuation conversation prompt
+- 🌙 **Glassmorphism Dark Theme** — Framer Motion animations, immersive premium UI
 
 ---
 
@@ -36,16 +44,18 @@
 
 ## 🛠 Tech Stack
 
-| Layer      | Technology                                    |
-| ---------- | --------------------------------------------- |
-| Frontend   | Next.js 16 · React 19 · TypeScript 5          |
-| Styling    | TailwindCSS 4 · Glassmorphism dark theme      |
-| Animation  | Framer Motion                                 |
-| Icons      | Lucide React                                  |
-| Search     | Tavily API (免费 1,000 次/月)                  |
-| AI         | Azure OpenAI GPT-4o ($200 免费额度)            |
-| Database   | PostgreSQL · Drizzle ORM                       |
-| Validation | Zod                                            |
+| Layer         | Technology                                    |
+| ------------- | --------------------------------------------- |
+| Frontend      | Next.js 16 · React 19 · TypeScript 5          |
+| Styling       | TailwindCSS 4 · Glassmorphism dark theme      |
+| Animation     | Framer Motion                                 |
+| i18n          | Custom context-based (EN / 中文)               |
+| Address Input | Google Places Autocomplete (optional)          |
+| Search        | Tavily API (free 1,000/mo)                     |
+| AI            | Azure OpenAI GPT-4o ($200 free credits)        |
+| Database      | PostgreSQL · Drizzle ORM                       |
+| Notifications | Resend API (email) · Webhooks                  |
+| Validation    | Zod                                            |
 
 ---
 
@@ -59,32 +69,40 @@ cd housevaluesellerleads
 pnpm install
 ```
 
-### 2. 配置环境变量
+### 2. Configure Environment Variables
 
 ```bash
-cp .env.local.example .env.local  # 或手动创建
+cp .env.local.example .env.local  # or create manually
 ```
 
 ```bash
-# Tavily Search — https://tavily.com 注册免费 API Key
+# Tavily Search — https://tavily.com (free API key)
 TAVILY_API_KEY=tvly-xxx
 
-# Azure OpenAI — Azure Portal 创建 OpenAI 资源
+# Azure OpenAI — Create resource in Azure Portal
 AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com
 AZURE_OPENAI_API_KEY=xxx
 AZURE_OPENAI_DEPLOYMENT=gpt-4o
 
-# PostgreSQL (可选 — 不配置则 Lead 输出到 console)
+# PostgreSQL (optional — leads logged to console if not set)
 DATABASE_URL=postgresql://user:password@localhost:5432/smartvalue
+
+# Google Places Autocomplete (optional)
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=
+
+# Agent Notification (optional)
+AGENT_NOTIFICATION_EMAIL=agent@example.com
+RESEND_API_KEY=re_xxx
+AGENT_WEBHOOK_URL=https://your-crm.com/webhook
 ```
 
-### 3. 数据库初始化 (可选)
+### 3. Database Setup (Optional)
 
 ```bash
-pnpm drizzle-kit push    # 同步 Drizzle Schema → PostgreSQL
+pnpm drizzle-kit push    # Sync Drizzle Schema → PostgreSQL
 ```
 
-### 4. 启动开发服务器
+### 4. Start Dev Server
 
 ```bash
 pnpm dev       # → http://localhost:3000
