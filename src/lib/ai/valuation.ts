@@ -6,6 +6,38 @@
  * - Azure OpenAI: $200 free credits, GPT-4o analysis
  */
 
+import { z } from "zod";
+
+// ─── Zod Schema for AI Response Validation ────────────────────────
+
+const ComparableSaleSchema = z.object({
+  address: z.string(),
+  price: z.number(),
+  date: z.string(),
+  beds: z.number(),
+  baths: z.number(),
+  sqft: z.number(),
+});
+
+const ValuationResponseSchema = z.object({
+  estimatedValueLow: z.number(),
+  estimatedValueHigh: z.number(),
+  estimatedValue: z.number(),
+  appreciationRate: z.number(),
+  propertyDetails: z.object({
+    beds: z.number(),
+    baths: z.number(),
+    sqft: z.number(),
+    yearBuilt: z.number(),
+    lotSize: z.string(),
+    propertyType: z.string(),
+  }),
+  comparableSales: z.array(ComparableSaleSchema).min(1),
+  schoolRating: z.number().min(0).max(10),
+  neighborhoodTrend: z.enum(["rising", "stable", "declining"]),
+  marketSummary: z.string().min(10),
+});
+
 // ─── Tavily Search ────────────────────────────────────────────────
 
 interface TavilyResult {
@@ -49,7 +81,8 @@ async function searchPropertyData(address: string): Promise<TavilyResponse> {
 
 function buildPromptWithSearchData(
   address: string,
-  searchData: TavilyResponse
+  searchData: TavilyResponse,
+  locale: string
 ): string {
   const searchContext = searchData.results
     .map(
@@ -61,6 +94,11 @@ function buildPromptWithSearchData(
   const tavilyAnswer = searchData.answer
     ? `\nTavily AI Summary:\n${searchData.answer}\n`
     : "";
+
+  const summaryLang =
+    locale === "zh"
+      ? "marketSummary must be in Chinese (简体中文)."
+      : "marketSummary must be in English.";
 
   return `Based on REAL web search results, provide a home valuation for: ${address}
 
@@ -99,7 +137,7 @@ Respond with ONLY a valid JSON object in this exact format:
   ],
   "schoolRating": <number 1-10>,
   "neighborhoodTrend": "<rising|stable|declining>",
-  "marketSummary": "<2-3 sentences in Chinese 简体中文>"
+  "marketSummary": "<2-3 sentences>"
 }
 
 Rules:
@@ -107,7 +145,7 @@ Rules:
 - If a specific value is not found, provide a reasonable estimate based on area data and note it.
 - Provide exactly 3 comparable sales.
 - All monetary values in USD.
-- marketSummary must be in Chinese (简体中文).
+- ${summaryLang}
 - Respond ONLY with the JSON object, no other text.`;
 }
 
@@ -115,7 +153,8 @@ const SYSTEM_PROMPT = `You are an expert real estate appraiser AI. You analyze r
 
 async function analyzeWithAzureOpenAI(
   address: string,
-  searchData: TavilyResponse
+  searchData: TavilyResponse,
+  locale: string
 ) {
   const endpoint = process.env.AZURE_OPENAI_ENDPOINT;
   const apiKey = process.env.AZURE_OPENAI_API_KEY;
@@ -127,47 +166,61 @@ async function analyzeWithAzureOpenAI(
     );
   }
 
-  const userPrompt = buildPromptWithSearchData(address, searchData);
+  const userPrompt = buildPromptWithSearchData(address, searchData, locale);
 
   const apiUrl = `${endpoint}/openai/deployments/${deployment}/chat/completions?api-version=2024-10-21`;
 
-  const response = await fetch(apiUrl, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "api-key": apiKey,
-    },
-    body: JSON.stringify({
-      messages: [
-        { role: "system", content: SYSTEM_PROMPT },
-        { role: "user", content: userPrompt },
-      ],
-      temperature: 0.3,
-      max_tokens: 2000,
-      response_format: { type: "json_object" },
-    }),
-  });
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 30_000); // 30s timeout
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(
-      `Azure OpenAI API error: ${response.status} - ${errorText}`
-    );
+  try {
+    const response = await fetch(apiUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "api-key": apiKey,
+      },
+      body: JSON.stringify({
+        messages: [
+          { role: "system", content: SYSTEM_PROMPT },
+          { role: "user", content: userPrompt },
+        ],
+        temperature: 0.3,
+        max_tokens: 2000,
+        response_format: { type: "json_object" },
+      }),
+      signal: controller.signal,
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(
+        `Azure OpenAI API error: ${response.status} - ${errorText}`
+      );
+    }
+
+    const data = await response.json();
+    const content = data.choices?.[0]?.message?.content;
+
+    if (!content) {
+      throw new Error("No response from Azure OpenAI");
+    }
+
+    // Parse and validate with Zod
+    const parsed = JSON.parse(content);
+    const validated = ValuationResponseSchema.parse(parsed);
+    return validated;
+  } finally {
+    clearTimeout(timeout);
   }
-
-  const data = await response.json();
-  const content = data.choices?.[0]?.message?.content;
-
-  if (!content) {
-    throw new Error("No response from Azure OpenAI");
-  }
-
-  return JSON.parse(content);
 }
 
 // ─── Main Entry Point ─────────────────────────────────────────────
 
-export async function generateValuation(address: string) {
+export async function generateValuation(
+  address: string,
+  locale: string = "en"
+) {
   try {
     // Step 1: Search for real property data via Tavily
     console.log(`[Valuation] Searching Tavily for: ${address}`);
@@ -176,12 +229,12 @@ export async function generateValuation(address: string) {
       `[Valuation] Got ${searchData.results.length} search results`
     );
 
-    // Step 2: Analyze with Azure OpenAI
+    // Step 2: Analyze with Azure OpenAI (with Zod validation)
     console.log(`[Valuation] Analyzing with Azure OpenAI...`);
-    const result = await analyzeWithAzureOpenAI(address, searchData);
+    const result = await analyzeWithAzureOpenAI(address, searchData, locale);
 
     return {
-      success: true,
+      success: true as const,
       data: result,
       model: `azure-${process.env.AZURE_OPENAI_DEPLOYMENT || "gpt-4o"}+tavily`,
       sources: searchData.results.map((r) => ({
@@ -191,8 +244,20 @@ export async function generateValuation(address: string) {
     };
   } catch (error) {
     console.error("Valuation error:", error);
+
+    // Distinguish different error types for the client
+    let errorCode = "VALUATION_FAILED";
+    if (error instanceof Error) {
+      if (error.name === "AbortError") errorCode = "TIMEOUT";
+      else if (error.message.includes("not configured")) errorCode = "CONFIG_ERROR";
+      else if (error.message.includes("Tavily")) errorCode = "SEARCH_FAILED";
+      else if (error.message.includes("Azure")) errorCode = "AI_FAILED";
+      else if (error.name === "ZodError") errorCode = "INVALID_AI_RESPONSE";
+    }
+
     return {
-      success: false,
+      success: false as const,
+      errorCode,
       error: error instanceof Error ? error.message : "Unknown error",
       data: null,
     };

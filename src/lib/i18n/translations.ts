@@ -306,6 +306,48 @@ export const translations = {
     zh: "© {year} Smart Value",
     en: "© {year} Smart Value",
   },
+
+  // ─── Error Codes ───────────────────────────────────────
+  "error.RATE_LIMITED": {
+    zh: "请求过于频繁，请稍后重试",
+    en: "Too many requests. Please try again later.",
+  },
+  "error.INVALID_ADDRESS": {
+    zh: "请输入有效的房屋地址",
+    en: "Please enter a valid property address.",
+  },
+  "error.VALUATION_FAILED": {
+    zh: "估值失败，请稍后重试",
+    en: "Valuation failed. Please try again later.",
+  },
+  "error.TIMEOUT": {
+    zh: "请求超时，请稍后重试",
+    en: "Request timed out. Please try again.",
+  },
+  "error.CONFIG_ERROR": {
+    zh: "服务配置错误，请联系管理员",
+    en: "Service configuration error. Please contact support.",
+  },
+  "error.SEARCH_FAILED": {
+    zh: "数据搜索失败，请稍后重试",
+    en: "Data search failed. Please try again later.",
+  },
+  "error.AI_FAILED": {
+    zh: "AI 分析失败，请稍后重试",
+    en: "AI analysis failed. Please try again later.",
+  },
+  "error.INVALID_AI_RESPONSE": {
+    zh: "AI 返回格式异常，请重试",
+    en: "AI returned an invalid response. Please try again.",
+  },
+  "error.SERVER_ERROR": {
+    zh: "服务器错误，请稍后重试",
+    en: "Server error. Please try again later.",
+  },
+  "error.FORBIDDEN": {
+    zh: "请求被拒绝",
+    en: "Request denied.",
+  },
 } as const;
 
 export type TranslationKey = keyof typeof translations;

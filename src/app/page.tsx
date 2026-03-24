@@ -86,13 +86,15 @@ export default function HomePage() {
         body: JSON.stringify({
           address: address.trim(),
           agentSlug: agentSlug || undefined,
+          locale,
         }),
       });
 
       const data = await res.json();
 
       if (!res.ok || !data.success) {
-        throw new Error(data.error || (locale === "zh" ? "估值失败" : "Valuation failed"));
+        const code = data.errorCode || "VALUATION_FAILED";
+        throw new Error(t(`error.${code}` as Parameters<typeof t>[0]));
       }
 
       setValuation(data.valuation);
@@ -102,9 +104,7 @@ export default function HomePage() {
       setError(
         err instanceof Error
           ? err.message
-          : locale === "zh"
-            ? "估值失败，请重试"
-            : "Valuation failed, please try again"
+          : t("error.VALUATION_FAILED")
       );
       setViewState("input");
     }
