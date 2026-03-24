@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { LocaleProvider } from "@/lib/i18n";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -8,10 +9,25 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "AI 智能房屋估值 | Smart Value",
+  title: "AI Home Valuation | Smart Value",
   description:
-    "免费 AI 驱动的房屋估值工具。输入地址，即刻获取专业级房屋估价报告，包括近期成交对比、市场趋势分析和学区评分。",
-  keywords: ["房屋估值", "AI估价", "home valuation", "房产评估", "real estate"],
+    "Free AI-powered home valuation tool. Enter an address and get a professional valuation report with comparable sales, market trends, and school ratings in 60 seconds.",
+  keywords: [
+    "home valuation",
+    "AI valuation",
+    "房屋估值",
+    "AI估价",
+    "real estate",
+    "property value",
+    "Zestimate alternative",
+    "free home value",
+  ],
+  openGraph: {
+    title: "Smart Value — AI Home Valuation",
+    description:
+      "Get a free AI-powered home valuation in 60 seconds. Comparable sales, market trends, school ratings and more.",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
@@ -20,8 +36,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="zh-CN" className="dark">
-      <body className={`${inter.variable} antialiased`}>{children}</body>
+    <html lang="en" className="dark">
+      <body className={`${inter.variable} antialiased`}>
+        <LocaleProvider>{children}</LocaleProvider>
+      </body>
     </html>
   );
 }

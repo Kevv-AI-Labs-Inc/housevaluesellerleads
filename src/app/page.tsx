@@ -1,14 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   MapPin,
   TrendingUp,
   Home,
   Search,
-  Mail,
   Star,
-  ArrowRight,
   Building2,
   BarChart3,
   GraduationCap,
@@ -19,6 +17,12 @@ import {
   Sparkles,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useI18n } from "@/lib/i18n";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { LeadGate } from "@/components/LeadGate";
+import { AddressAutocomplete } from "@/components/AddressAutocomplete";
+import { ShareButtons } from "@/components/ShareButtons";
+import { PricingCTA } from "@/components/PricingCTA";
 
 interface ValuationData {
   estimatedValueLow: number;
@@ -46,22 +50,28 @@ interface ValuationData {
   marketSummary: string;
 }
 
-type ViewState = "input" | "loading" | "report";
+type ViewState = "input" | "loading" | "gate" | "report";
 
 export default function HomePage() {
+  const { t, locale } = useI18n();
   const [address, setAddress] = useState("");
   const [viewState, setViewState] = useState<ViewState>("input");
   const [valuation, setValuation] = useState<ValuationData | null>(null);
   const [submittedAddress, setSubmittedAddress] = useState("");
-  const [email, setEmail] = useState("");
-  const [emailSubmitted, setEmailSubmitted] = useState(false);
-  const [emailLoading, setEmailLoading] = useState(false);
   const [showChat, setShowChat] = useState(false);
   const [error, setError] = useState("");
+  const [agentSlug, setAgentSlug] = useState("");
+
+  // Read ?agent=xxx from URL on mount
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const agent = params.get("agent");
+    if (agent) setAgentSlug(agent);
+  }, []);
 
   const handleValuation = async () => {
     if (!address.trim() || address.trim().length < 5) {
-      setError("请输入完整的房屋地址");
+      setError(t("input.error.required"));
       return;
     }
 
@@ -73,46 +83,37 @@ export default function HomePage() {
       const res = await fetch("/api/valuation", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ address: address.trim() }),
+        body: JSON.stringify({
+          address: address.trim(),
+          agentSlug: agentSlug || undefined,
+        }),
       });
 
       const data = await res.json();
 
       if (!res.ok || !data.success) {
-        throw new Error(data.error || "估值失败");
+        throw new Error(data.error || (locale === "zh" ? "估值失败" : "Valuation failed"));
       }
 
       setValuation(data.valuation);
-      setViewState("report");
-
-      // Show chat widget after a delay
-      setTimeout(() => setShowChat(true), 3000);
+      // Go to gate instead of report
+      setViewState("gate");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "估值失败，请重试");
+      setError(
+        err instanceof Error
+          ? err.message
+          : locale === "zh"
+            ? "估值失败，请重试"
+            : "Valuation failed, please try again"
+      );
       setViewState("input");
     }
   };
 
-  const handleEmailSubmit = async () => {
-    if (!email.includes("@")) return;
-
-    setEmailLoading(true);
-    try {
-      await fetch("/api/leads", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email,
-          address: submittedAddress,
-          valuationResult: valuation,
-        }),
-      });
-      setEmailSubmitted(true);
-    } catch {
-      // Still show success to user
-      setEmailSubmitted(true);
-    }
-    setEmailLoading(false);
+  const handleLeadCaptured = () => {
+    setViewState("report");
+    // Show chat widget after a delay
+    setTimeout(() => setShowChat(true), 3000);
   };
 
   const formatPrice = (price: number) => {
@@ -128,6 +129,13 @@ export default function HomePage() {
       currency: "USD",
       maximumFractionDigits: 0,
     }).format(price);
+  };
+
+  const resetAll = () => {
+    setViewState("input");
+    setAddress("");
+    setValuation(null);
+    setShowChat(false);
   };
 
   return (
@@ -165,9 +173,13 @@ export default function HomePage() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-4"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-sm font-medium mb-6">
-            <Sparkles size={14} />
-            AI 驱动 · 免费估价
+          <div className="flex items-center justify-between mb-6">
+            <div /> {/* Spacer */}
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-sm font-medium">
+              <Sparkles size={14} />
+              {t("header.badge")}
+            </div>
+            <LanguageSwitcher />
           </div>
         </motion.header>
 
@@ -183,13 +195,12 @@ export default function HomePage() {
             >
               <div className="text-center mb-12">
                 <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight mb-6">
-                  <span className="gradient-text">您的房子</span>
+                  <span className="gradient-text">{t("hero.title1")}</span>
                   <br />
-                  <span className="text-white">现在值多少？</span>
+                  <span className="text-white">{t("hero.title2")}</span>
                 </h1>
                 <p className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed">
-                  输入地址，AI
-                  即刻分析公开数据，为您生成专业级房屋估价报告
+                  {t("hero.subtitle")}
                 </p>
               </div>
 
@@ -201,24 +212,23 @@ export default function HomePage() {
                   </div>
                   <div>
                     <h2 className="text-lg font-semibold text-white">
-                      输入房屋地址
+                      {t("input.label")}
                     </h2>
                     <p className="text-sm text-slate-500">
-                      支持美国所有地区
+                      {t("input.sublabel")}
                     </p>
                   </div>
                 </div>
 
                 <div className="space-y-4">
-                  <input
-                    type="text"
-                    className="input-field"
-                    placeholder="例如: 123 Main St, Flushing, NY 11355"
+                  <AddressAutocomplete
                     value={address}
-                    onChange={(e) => {
-                      setAddress(e.target.value);
+                    onChange={(val) => {
+                      setAddress(val);
                       setError("");
                     }}
+                    onSelect={(place) => setAddress(place.formatted)}
+                    placeholder={t("input.placeholder")}
                     onKeyDown={(e) => e.key === "Enter" && handleValuation()}
                   />
 
@@ -237,16 +247,16 @@ export default function HomePage() {
                     className="btn-primary w-full flex items-center justify-center gap-2"
                   >
                     <Search size={18} />
-                    免费 AI 估价
+                    {t("input.button")}
                   </button>
                 </div>
 
                 {/* Features */}
                 <div className="grid grid-cols-3 gap-3 mt-8">
                   {[
-                    { icon: BarChart3, label: "市场分析" },
-                    { icon: Building2, label: "成交对比" },
-                    { icon: GraduationCap, label: "学区评分" },
+                    { icon: BarChart3, label: t("input.feature.market") },
+                    { icon: Building2, label: t("input.feature.comps") },
+                    { icon: GraduationCap, label: t("input.feature.school") },
                   ].map((feature) => (
                     <div
                       key={feature.label}
@@ -265,15 +275,15 @@ export default function HomePage() {
               <div className="flex items-center justify-center gap-6 mt-8 text-slate-600 text-sm">
                 <span className="flex items-center gap-1">
                   <CheckCircle2 size={14} className="text-emerald-500/60" />
-                  完全免费
+                  {t("trust.free")}
                 </span>
                 <span className="flex items-center gap-1">
                   <CheckCircle2 size={14} className="text-emerald-500/60" />
-                  60秒出结果
+                  {t("trust.fast")}
                 </span>
                 <span className="flex items-center gap-1">
                   <CheckCircle2 size={14} className="text-emerald-500/60" />
-                  数据安全
+                  {t("trust.safe")}
                 </span>
               </div>
             </motion.div>
@@ -291,23 +301,26 @@ export default function HomePage() {
             >
               <div className="relative mb-8">
                 <div className="w-20 h-20 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center">
-                  <Loader2 size={32} className="text-indigo-400 animate-spin" />
+                  <Loader2
+                    size={32}
+                    className="text-indigo-400 animate-spin"
+                  />
                 </div>
                 <div className="absolute -top-1 -right-1 w-4 h-4 bg-cyan-400 rounded-full animate-ping" />
               </div>
 
-              <h2 className="text-2xl font-bold mb-3">AI 正在分析...</h2>
+              <h2 className="text-2xl font-bold mb-3">{t("loading.title")}</h2>
               <p className="text-slate-400 mb-8 text-center max-w-md">
-                正在搜索 <span className="text-indigo-300">{submittedAddress}</span> 的公开数据
+                {t("loading.subtitle", { address: submittedAddress })}
               </p>
 
               <div className="w-full max-w-md space-y-3">
                 {[
-                  "搜索税务评估记录...",
-                  "分析近期成交数据...",
-                  "评估区域市场趋势...",
-                  "计算学区评分...",
-                  "生成估价报告...",
+                  t("loading.step1"),
+                  t("loading.step2"),
+                  t("loading.step3"),
+                  t("loading.step4"),
+                  t("loading.step5"),
                 ].map((step, i) => (
                   <motion.div
                     key={step}
@@ -321,15 +334,33 @@ export default function HomePage() {
                       animate={{ scale: 1 }}
                       transition={{ delay: i * 0.6 + 0.3 }}
                     >
-                      <CheckCircle2
-                        size={16}
-                        className="text-emerald-400"
-                      />
+                      <CheckCircle2 size={16} className="text-emerald-400" />
                     </motion.div>
                     <span className="text-slate-400">{step}</span>
                   </motion.div>
                 ))}
               </div>
+            </motion.div>
+          )}
+
+          {/* ======== GATE STATE (Lead Capture) ======== */}
+          {viewState === "gate" && valuation && (
+            <motion.div
+              key="gate"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.4 }}
+            >
+              <LeadGate
+                estimatedValue={valuation.estimatedValue}
+                estimatedValueLow={valuation.estimatedValueLow}
+                estimatedValueHigh={valuation.estimatedValueHigh}
+                address={submittedAddress}
+                agentSlug={agentSlug}
+                onLeadCaptured={handleLeadCaptured}
+                valuationResult={valuation}
+              />
             </motion.div>
           )}
 
@@ -345,7 +376,7 @@ export default function HomePage() {
               {/* Report Header */}
               <div className="text-center mb-8">
                 <h1 className="text-3xl md:text-4xl font-extrabold mb-2">
-                  <span className="gradient-text">AI 估价报告</span>
+                  <span className="gradient-text">{t("report.title")}</span>
                 </h1>
                 <p className="text-slate-400 flex items-center justify-center gap-2">
                   <MapPin size={14} />
@@ -363,7 +394,7 @@ export default function HomePage() {
                 <div className="flex items-center justify-center gap-2 mb-4">
                   <Home size={20} className="text-indigo-400" />
                   <span className="text-slate-400 text-sm font-medium">
-                    估算市场价值
+                    {t("report.estimatedValue")}
                   </span>
                 </div>
                 <div className="value-display gradient-text mb-2">
@@ -371,7 +402,8 @@ export default function HomePage() {
                   {formatFullPrice(valuation.estimatedValueHigh)}
                 </div>
                 <p className="text-slate-500 text-sm mb-6">
-                  最佳估值: {formatFullPrice(valuation.estimatedValue)}
+                  {t("report.bestEstimate")}:{" "}
+                  {formatFullPrice(valuation.estimatedValue)}
                 </p>
 
                 <div className="flex items-center justify-center gap-3 flex-wrap">
@@ -379,12 +411,14 @@ export default function HomePage() {
                     className={`stat-badge ${valuation.appreciationRate >= 0 ? "positive" : "neutral"}`}
                   >
                     <TrendingUp size={14} />
-                    较去年{valuation.appreciationRate >= 0 ? "增值" : "变化"}{" "}
+                    {valuation.appreciationRate >= 0
+                      ? t("report.appreciation.up")
+                      : t("report.appreciation.change")}{" "}
                     {Math.abs(valuation.appreciationRate).toFixed(1)}%
                   </span>
                   <span className="stat-badge neutral">
                     <Star size={14} />
-                    学区评分: {valuation.schoolRating}/10
+                    {t("report.schoolRating")}: {valuation.schoolRating}/10
                   </span>
                 </div>
               </motion.div>
@@ -398,32 +432,32 @@ export default function HomePage() {
               >
                 <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                   <Building2 size={18} className="text-indigo-400" />
-                  房屋信息
+                  {t("report.propertyInfo")}
                 </h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   {[
                     {
-                      label: "卧室",
-                      value: `${valuation.propertyDetails.beds} 间`,
+                      label: t("report.beds"),
+                      value: `${valuation.propertyDetails.beds}${locale === "zh" ? " 间" : ""}`,
                     },
                     {
-                      label: "浴室",
-                      value: `${valuation.propertyDetails.baths} 间`,
+                      label: t("report.baths"),
+                      value: `${valuation.propertyDetails.baths}${locale === "zh" ? " 间" : ""}`,
                     },
                     {
-                      label: "面积",
+                      label: t("report.sqft"),
                       value: `${valuation.propertyDetails.sqft.toLocaleString()} sqft`,
                     },
                     {
-                      label: "建成年份",
+                      label: t("report.yearBuilt"),
                       value: `${valuation.propertyDetails.yearBuilt}`,
                     },
                     {
-                      label: "占地",
+                      label: t("report.lotSize"),
                       value: valuation.propertyDetails.lotSize,
                     },
                     {
-                      label: "类型",
+                      label: t("report.propertyType"),
                       value: valuation.propertyDetails.propertyType,
                     },
                   ].map((item) => (
@@ -451,7 +485,7 @@ export default function HomePage() {
               >
                 <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                   <BarChart3 size={18} className="text-cyan-400" />
-                  近期可比成交
+                  {t("report.comps")}
                 </h3>
                 <div className="space-y-2">
                   {valuation.comparableSales.map((comp, i) => (
@@ -461,7 +495,10 @@ export default function HomePage() {
                           {comp.address}
                         </p>
                         <p className="text-xs text-slate-500">
-                          {comp.beds}卧 · {comp.baths}浴 ·{" "}
+                          {comp.beds}
+                          {locale === "zh" ? "卧" : "bd"} ·{" "}
+                          {comp.baths}
+                          {locale === "zh" ? "浴" : "ba"} ·{" "}
                           {comp.sqft.toLocaleString()} sqft
                         </p>
                       </div>
@@ -485,7 +522,7 @@ export default function HomePage() {
               >
                 <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
                   <TrendingUp size={18} className="text-emerald-400" />
-                  市场趋势分析
+                  {t("report.marketTrend")}
                 </h3>
                 <p className="text-slate-300 text-sm leading-relaxed">
                   {valuation.marketSummary}
@@ -494,99 +531,34 @@ export default function HomePage() {
                   <span
                     className={`stat-badge ${valuation.neighborhoodTrend === "rising" ? "positive" : "neutral"}`}
                   >
-                    区域趋势:{" "}
+                    {t("report.trendLabel")}:{" "}
                     {valuation.neighborhoodTrend === "rising"
-                      ? "📈 上涨"
+                      ? t("report.trend.rising")
                       : valuation.neighborhoodTrend === "stable"
-                        ? "📊 稳定"
-                        : "📉 下降"}
+                        ? t("report.trend.stable")
+                        : t("report.trend.declining")}
                   </span>
                 </div>
               </motion.div>
 
-              {/* Email Capture */}
-              <motion.div
-                className="glass-card p-8 text-center"
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-              >
-                {!emailSubmitted ? (
-                  <>
-                    <div className="w-14 h-14 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center mx-auto mb-4">
-                      <Mail size={24} className="text-indigo-400" />
-                    </div>
-                    <h3 className="text-xl font-bold mb-2">
-                      获取完整报告 + 定制建议
-                    </h3>
-                    <p className="text-slate-400 text-sm mb-6 max-w-md mx-auto">
-                      输入邮箱，我们将发送详细的 PDF
-                      估价报告，包括个性化的出售建议和最佳时机分析
-                    </p>
-                    <div className="flex gap-3 max-w-md mx-auto">
-                      <input
-                        type="email"
-                        className="input-field flex-1"
-                        placeholder="your@email.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        onKeyDown={(e) =>
-                          e.key === "Enter" && handleEmailSubmit()
-                        }
-                      />
-                      <button
-                        onClick={handleEmailSubmit}
-                        disabled={emailLoading || !email.includes("@")}
-                        className="btn-primary flex items-center gap-2 whitespace-nowrap"
-                      >
-                        {emailLoading ? (
-                          <Loader2 size={16} className="animate-spin" />
-                        ) : (
-                          <>
-                            获取报告
-                            <ArrowRight size={16} />
-                          </>
-                        )}
-                      </button>
-                    </div>
-                  </>
-                ) : (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                  >
-                    <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mx-auto mb-4">
-                      <CheckCircle2
-                        size={28}
-                        className="text-emerald-400"
-                      />
-                    </div>
-                    <h3 className="text-xl font-bold mb-2 text-emerald-300">
-                      提交成功！
-                    </h3>
-                    <p className="text-slate-400 text-sm">
-                      完整估价报告将发送到{" "}
-                      <span className="text-indigo-300">{email}</span>
-                    </p>
-                  </motion.div>
-                )}
-              </motion.div>
+              {/* Share Buttons */}
+              <ShareButtons
+                address={submittedAddress}
+                estimatedValue={valuation.estimatedValue}
+                agentSlug={agentSlug}
+              />
+
+              {/* Pricing CTA */}
+              <PricingCTA />
 
               {/* New Valuation Button */}
               <div className="text-center pt-4">
                 <button
-                  onClick={() => {
-                    setViewState("input");
-                    setAddress("");
-                    setValuation(null);
-                    setEmailSubmitted(false);
-                    setEmail("");
-                    setShowChat(false);
-                  }}
+                  onClick={resetAll}
                   className="text-slate-500 hover:text-indigo-400 text-sm transition-colors inline-flex items-center gap-2"
                 >
                   <Search size={14} />
-                  估价另一个地址
+                  {t("report.newValuation")}
                 </button>
               </div>
             </motion.div>
@@ -595,10 +567,12 @@ export default function HomePage() {
 
         {/* Footer */}
         <footer className="text-center mt-16 pb-8 text-slate-600 text-xs">
-          <p>
-            Powered by AI · 估值仅供参考，不构成投资建议
+          <p>{t("footer.disclaimer")}</p>
+          <p className="mt-1">
+            {t("footer.copyright", {
+              year: new Date().getFullYear().toString(),
+            })}
           </p>
-          <p className="mt-1">© {new Date().getFullYear()} Smart Value</p>
         </footer>
       </main>
 
@@ -621,9 +595,9 @@ export default function HomePage() {
               <div className="chat-bubble">
                 <div className="flex items-center gap-2 mb-1">
                   <MessageCircle size={14} />
-                  <span className="font-semibold">AI 助手</span>
+                  <span className="font-semibold">{t("chat.title")}</span>
                 </div>
-                <p>对估价结果有疑问？需要具体聊聊您的房子吗？💬</p>
+                <p>{t("chat.message")}</p>
               </div>
             </div>
           </motion.div>
