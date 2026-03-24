@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
 import {
   MapPin,
   TrendingUp,
@@ -61,6 +62,7 @@ export default function HomePage() {
   const [showChat, setShowChat] = useState(false);
   const [error, setError] = useState("");
   const [agentSlug, setAgentSlug] = useState("");
+  const abortRef = useRef<AbortController | null>(null);
 
   // Read ?agent=xxx from URL on mount
   useEffect(() => {
@@ -79,6 +81,11 @@ export default function HomePage() {
     setSubmittedAddress(address.trim());
     setViewState("loading");
 
+    // Create abort controller for timeout + cancel
+    const controller = new AbortController();
+    abortRef.current = controller;
+    const timeout = setTimeout(() => controller.abort(), 60_000); // 60s
+
     try {
       const res = await fetch("/api/valuation", {
         method: "POST",
@@ -88,6 +95,7 @@ export default function HomePage() {
           agentSlug: agentSlug || undefined,
           locale,
         }),
+        signal: controller.signal,
       });
 
       const data = await res.json();
@@ -101,12 +109,19 @@ export default function HomePage() {
       // Go to gate instead of report
       setViewState("gate");
     } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : t("error.VALUATION_FAILED")
-      );
+      if (err instanceof DOMException && err.name === "AbortError") {
+        setError(t("error.TIMEOUT"));
+      } else {
+        setError(
+          err instanceof Error
+            ? err.message
+            : t("error.VALUATION_FAILED")
+        );
+      }
       setViewState("input");
+    } finally {
+      clearTimeout(timeout);
+      abortRef.current = null;
     }
   };
 
@@ -297,7 +312,7 @@ export default function HomePage() {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
               transition={{ duration: 0.4 }}
-              className="flex flex-col items-center justify-center py-20"
+              className="flex flex-col items-center justify-center py-20 relative"
             >
               <div className="relative mb-8">
                 <div className="w-20 h-20 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center">
@@ -340,6 +355,19 @@ export default function HomePage() {
                   </motion.div>
                 ))}
               </div>
+
+              {/* Cancel button */}
+              <button
+                onClick={() => {
+                  abortRef.current?.abort();
+                  setViewState("input");
+                  setError("");
+                }}
+                className="mt-8 text-slate-500 hover:text-red-400 text-sm transition-colors inline-flex items-center gap-1"
+              >
+                <X size={14} />
+                {locale === "zh" ? "取消" : "Cancel"}
+              </button>
             </motion.div>
           )}
 
@@ -568,6 +596,15 @@ export default function HomePage() {
         {/* Footer */}
         <footer className="text-center mt-16 pb-8 text-slate-600 text-xs">
           <p>{t("footer.disclaimer")}</p>
+          <p className="mt-2 flex items-center justify-center gap-3">
+            <Link href="/privacy" className="hover:text-indigo-400 transition-colors">
+              Privacy Policy
+            </Link>
+            <span>·</span>
+            <Link href="/pricing" className="hover:text-indigo-400 transition-colors">
+              For Agents
+            </Link>
+          </p>
           <p className="mt-1">
             {t("footer.copyright", {
               year: new Date().getFullYear().toString(),

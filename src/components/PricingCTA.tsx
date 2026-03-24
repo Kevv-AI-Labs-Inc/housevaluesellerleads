@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useI18n } from "@/lib/i18n";
 import { motion } from "framer-motion";
 import { Sparkles, ArrowRight, Check } from "lucide-react";
@@ -47,13 +48,13 @@ export function PricingCTA() {
         ))}
       </div>
 
-      <a
-        href="mailto:support@kevv.ai?subject=Smart Value Agent Plan"
+      <Link
+        href="/pricing"
         className="btn-primary inline-flex items-center gap-2"
       >
         {t("pricing.button")}
         <ArrowRight size={16} />
-      </a>
+      </Link>
     </motion.div>
   );
 }

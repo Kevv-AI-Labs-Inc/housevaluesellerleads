@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { generateValuation } from "@/lib/ai/valuation";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import type { ValuationResult } from "@/lib/db/schema";
 
 export async function POST(request: NextRequest) {
   try {
@@ -72,6 +73,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // ── Save to valuation_history (non-blocking) ──────
+    saveValuationHistory(
+      address.trim(),
+      result.data,
+      result.model,
+      body.agentSlug
+    ).catch((err) =>
+      console.error("Failed to save valuation history:", err)
+    );
+
     return NextResponse.json({
       success: true,
       address: address.trim(),
@@ -84,5 +95,31 @@ export async function POST(request: NextRequest) {
       { errorCode: "SERVER_ERROR", error: "Internal server error" },
       { status: 500 }
     );
+  }
+}
+
+// ── Save to valuation_history (non-blocking) ──────────────
+
+async function saveValuationHistory(
+  address: string,
+  result: unknown,
+  model: string,
+  agentSlug?: string
+) {
+  try {
+    const { getDb } = await import("@/lib/db");
+    const db = getDb();
+    if (!db) return;
+
+    const { valuationHistory } = await import("@/lib/db/schema");
+    await db.insert(valuationHistory).values({
+      address,
+      result: result as ValuationResult,
+      modelUsed: model,
+      agentSlug: agentSlug || null,
+    });
+    console.log("✅ Valuation history saved:", address);
+  } catch (err) {
+    console.error("Failed to save valuation history:", err);
   }
 }
