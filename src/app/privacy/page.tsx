@@ -13,15 +13,15 @@ export default function PrivacyPage() {
     <div className="max-w-3xl mx-auto px-4 py-16">
       <Link
         href="/"
-        className="inline-flex items-center gap-2 text-slate-400 hover:text-indigo-400 transition-colors mb-8"
+        className="inline-flex items-center gap-2 text-slate-400 hover:text-teal-600 transition-colors mb-8"
       >
         <ArrowLeft size={16} />
         Back to Home
       </Link>
 
       <div className="flex items-center gap-3 mb-8">
-        <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center">
-          <Shield size={24} className="text-indigo-400" />
+        <div className="w-12 h-12 rounded-2xl bg-teal-50 border border-teal-200 flex items-center justify-center">
+          <Shield size={24} className="text-teal-600" />
         </div>
         <div>
           <h1 className="text-3xl font-bold">Privacy Policy</h1>
@@ -34,7 +34,7 @@ export default function PrivacyPage() {
       <div className="prose-dark space-y-8">
         <section>
           <h2 className="section-heading">
-            <Mail size={18} className="text-indigo-400" />
+            <Mail size={18} className="text-teal-600" />
             Information We Collect
           </h2>
           <p>
@@ -60,7 +60,7 @@ export default function PrivacyPage() {
 
         <section>
           <h2 className="section-heading">
-            <Database size={18} className="text-indigo-400" />
+            <Database size={18} className="text-teal-600" />
             How We Use Your Information
           </h2>
           <ul>
@@ -84,7 +84,7 @@ export default function PrivacyPage() {
 
         <section>
           <h2 className="section-heading">
-            <Share2 size={18} className="text-indigo-400" />
+            <Share2 size={18} className="text-teal-600" />
             Information Sharing
           </h2>
           <p>We do not sell your personal information to third parties.</p>
@@ -108,7 +108,7 @@ export default function PrivacyPage() {
 
         <section>
           <h2 className="section-heading">
-            <Lock size={18} className="text-indigo-400" />
+            <Lock size={18} className="text-teal-600" />
             Data Security
           </h2>
           <p>
@@ -131,7 +131,7 @@ export default function PrivacyPage() {
             To exercise these rights, contact us at{" "}
             <a
               href="mailto:privacy@kevv.ai"
-              className="text-indigo-400 hover:text-indigo-300"
+              className="text-teal-600 hover:text-teal-700"
             >
               privacy@kevv.ai
             </a>
@@ -147,14 +147,14 @@ export default function PrivacyPage() {
           </p>
         </section>
 
-        <section className="border-t border-white/10 pt-6">
+        <section className="border-t border-slate-200 pt-6">
           <p className="text-slate-500 text-sm">
             Smart Value is operated by Kevv AI Inc.
             <br />
             Contact:{" "}
             <a
               href="mailto:privacy@kevv.ai"
-              className="text-indigo-400 hover:text-indigo-300"
+              className="text-teal-600 hover:text-teal-700"
             >
               privacy@kevv.ai
             </a>

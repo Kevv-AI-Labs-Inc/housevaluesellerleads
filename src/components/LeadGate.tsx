@@ -91,8 +91,8 @@ export function LeadGate({
       {/* Blurred preview of value */}
       <div className="glass-card p-8 text-center mb-6 relative overflow-hidden">
         <div className="flex items-center justify-center gap-2 mb-3">
-          <Home size={18} className="text-indigo-400" />
-          <span className="text-slate-400 text-sm font-medium">
+          <Home size={18} className="text-teal-600" />
+          <span className="text-slate-500 text-sm font-medium">
             {t("gate.estimated")}
           </span>
         </div>
@@ -100,7 +100,7 @@ export function LeadGate({
           {formatFullPrice(estimatedValueLow)} —{" "}
           {formatFullPrice(estimatedValueHigh)}
         </div>
-        <p className="text-slate-500 text-sm gate-value-blur">
+        <p className="text-slate-400 text-sm gate-value-blur">
           {formatFullPrice(estimatedValue)}
         </p>
         {/* Overlay blur mask */}
@@ -115,11 +115,11 @@ export function LeadGate({
         transition={{ delay: 0.2 }}
       >
         <div className="text-center mb-6">
-          <div className="w-14 h-14 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center mx-auto mb-4">
-            <Lock size={24} className="text-indigo-400" />
+          <div className="w-14 h-14 rounded-2xl bg-teal-50 border border-teal-200 flex items-center justify-center mx-auto mb-4">
+            <Lock size={24} className="text-teal-600" />
           </div>
-          <h2 className="text-2xl font-bold mb-2">{t("gate.ready")}</h2>
-          <p className="text-slate-400 text-sm">{t("gate.subtitle")}</p>
+          <h2 className="text-2xl font-bold text-slate-800 mb-2">{t("gate.ready")}</h2>
+          <p className="text-slate-500 text-sm">{t("gate.subtitle")}</p>
         </div>
 
         <div className="space-y-4">
@@ -178,7 +178,7 @@ export function LeadGate({
             <motion.p
               initial={{ opacity: 0, y: -5 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-red-400 text-sm"
+              className="text-red-500 text-sm"
             >
               {error}
             </motion.p>
@@ -200,7 +200,7 @@ export function LeadGate({
           </button>
         </div>
 
-        <p className="text-slate-600 text-xs mt-4 text-center leading-relaxed">
+        <p className="text-slate-400 text-xs mt-4 text-center leading-relaxed">
           <Lock size={10} className="inline mr-1" />
           {t("gate.privacy")}
         </p>

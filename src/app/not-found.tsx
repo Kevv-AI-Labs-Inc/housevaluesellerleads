@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Home, Search, ArrowLeft } from "lucide-react";
+import { Home, Search } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function NotFound() {
@@ -13,10 +13,10 @@ export default function NotFound() {
         className="text-center max-w-md"
       >
         <div className="text-8xl font-extrabold gradient-text mb-4">404</div>
-        <h1 className="text-2xl font-bold text-white mb-3">
+        <h1 className="text-2xl font-bold text-slate-800 mb-3">
           Page Not Found
         </h1>
-        <p className="text-slate-400 mb-8">
+        <p className="text-slate-500 mb-8">
           The page you&apos;re looking for doesn&apos;t exist or has been moved.
         </p>
         <div className="flex items-center justify-center gap-4">
@@ -29,7 +29,7 @@ export default function NotFound() {
           </Link>
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-slate-400 hover:text-indigo-400 transition-colors"
+            className="inline-flex items-center gap-2 text-slate-400 hover:text-teal-600 transition-colors"
           >
             <Search size={16} />
             Get Valuation

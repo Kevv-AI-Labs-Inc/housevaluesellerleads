@@ -23,13 +23,13 @@ export default function Error({
         animate={{ opacity: 1, y: 0 }}
         className="text-center max-w-md"
       >
-        <div className="w-16 h-16 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center mx-auto mb-6">
-          <AlertTriangle size={32} className="text-red-400" />
+        <div className="w-16 h-16 rounded-2xl bg-red-50 border border-red-200 flex items-center justify-center mx-auto mb-6">
+          <AlertTriangle size={32} className="text-red-500" />
         </div>
-        <h1 className="text-2xl font-bold text-white mb-3">
+        <h1 className="text-2xl font-bold text-slate-800 mb-3">
           Something Went Wrong
         </h1>
-        <p className="text-slate-400 mb-8">
+        <p className="text-slate-500 mb-8">
           An unexpected error occurred. Please try again or return to the home
           page.
         </p>
@@ -43,7 +43,7 @@ export default function Error({
           </button>
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-slate-400 hover:text-indigo-400 transition-colors"
+            className="inline-flex items-center gap-2 text-slate-400 hover:text-teal-600 transition-colors"
           >
             <Home size={16} />
             Home

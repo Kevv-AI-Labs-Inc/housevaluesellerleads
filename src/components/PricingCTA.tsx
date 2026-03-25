@@ -22,16 +22,16 @@ export function PricingCTA() {
       transition={{ delay: 0.5 }}
     >
       <div className="flex items-center gap-2 mb-4">
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs font-semibold">
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-700 text-xs font-semibold">
           <Sparkles size={12} />
           {t("pricing.badge")}
         </span>
       </div>
 
-      <h3 className="text-xl font-bold mb-2">{t("pricing.title")}</h3>
-      <p className="text-slate-400 text-sm mb-4">
+      <h3 className="text-xl font-bold text-slate-800 mb-2">{t("pricing.title")}</h3>
+      <p className="text-slate-500 text-sm mb-4">
         {t("pricing.subtitle")}{" "}
-        <span className="text-indigo-300 font-bold text-base">
+        <span className="text-amber-700 font-bold text-base">
           {t("pricing.price")}
         </span>
       </p>
@@ -40,7 +40,7 @@ export function PricingCTA() {
         {features.map((f) => (
           <span
             key={f}
-            className="flex items-center gap-1.5 text-sm text-slate-300"
+            className="flex items-center gap-1.5 text-sm text-slate-600"
           >
             <Check size={14} className="text-emerald-400" />
             {f}

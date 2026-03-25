@@ -7,10 +7,10 @@ import {
   Zap,
   BarChart3,
   Bell,
-  Palette,
   Globe,
   Users,
   ArrowRight,
+  Palette,
 } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -100,7 +100,7 @@ export default function PricingPage() {
     <div className="max-w-5xl mx-auto px-4 py-16">
       <Link
         href="/"
-        className="inline-flex items-center gap-2 text-slate-400 hover:text-indigo-400 transition-colors mb-8"
+        className="inline-flex items-center gap-2 text-slate-400 hover:text-teal-600 transition-colors mb-8"
       >
         <ArrowLeft size={16} />
         Back to Home
@@ -108,16 +108,16 @@ export default function PricingPage() {
 
       {/* Header */}
       <div className="text-center mb-16">
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-300 text-sm font-medium mb-6">
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-50 border border-amber-200 text-amber-700 text-sm font-medium mb-6">
           <Sparkles size={14} />
           For Real Estate Agents
         </div>
         <h1 className="text-4xl md:text-5xl font-extrabold mb-4">
           <span className="gradient-text">Turn Every Visitor</span>
           <br />
-          <span className="text-white">Into a Seller Lead</span>
+          <span className="text-slate-800">Into a Seller Lead</span>
         </h1>
-        <p className="text-slate-400 text-lg max-w-2xl mx-auto">
+        <p className="text-slate-500 text-lg max-w-2xl mx-auto">
           Get your own AI-powered home valuation page. Homeowners enter their
           address, get a free valuation, and become your leads — automatically.
         </p>
@@ -130,11 +130,11 @@ export default function PricingPage() {
             key={h.title}
             className="report-card text-center p-5"
           >
-            <h.icon size={22} className="text-indigo-400 mx-auto mb-2" />
-            <h3 className="text-sm font-semibold text-white mb-1">
+            <h.icon size={22} className="text-teal-600 mx-auto mb-2" />
+            <h3 className="text-sm font-semibold text-slate-800 mb-1">
               {h.title}
             </h3>
-            <p className="text-xs text-slate-500">{h.desc}</p>
+            <p className="text-xs text-slate-400">{h.desc}</p>
           </div>
         ))}
       </div>
@@ -146,32 +146,32 @@ export default function PricingPage() {
             key={plan.name}
             className={`report-card p-6 relative ${
               plan.popular
-                ? "border-indigo-500/40 ring-1 ring-indigo-500/20"
+                ? "border-teal-400 ring-1 ring-teal-200"
                 : ""
             }`}
           >
             {plan.popular && (
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-indigo-500 text-white text-xs font-semibold">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-teal-600 text-white text-xs font-semibold">
                 Most Popular
               </div>
             )}
-            <h3 className="text-xl font-bold mb-1">{plan.name}</h3>
+            <h3 className="text-xl font-bold text-slate-800 mb-1">{plan.name}</h3>
             <div className="flex items-baseline gap-1 mb-3">
               <span className="text-3xl font-extrabold gradient-text">
                 {plan.price}
               </span>
-              <span className="text-slate-500 text-sm">{plan.period}</span>
+              <span className="text-slate-400 text-sm">{plan.period}</span>
             </div>
-            <p className="text-slate-400 text-sm mb-6">{plan.description}</p>
+            <p className="text-slate-500 text-sm mb-6">{plan.description}</p>
             <ul className="space-y-3 mb-8">
               {plan.features.map((f) => (
                 <li
                   key={f}
-                  className="flex items-start gap-2 text-sm text-slate-300"
+                  className="flex items-start gap-2 text-sm text-slate-600"
                 >
                   <Check
                     size={16}
-                    className="text-emerald-400 mt-0.5 shrink-0"
+                    className="text-emerald-500 mt-0.5 shrink-0"
                   />
                   {f}
                 </li>
@@ -182,7 +182,7 @@ export default function PricingPage() {
               className={`w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm transition-all ${
                 plan.popular
                   ? "btn-primary"
-                  : "bg-white/5 border border-white/10 text-white hover:bg-white/10"
+                  : "bg-slate-50 border border-slate-200 text-slate-700 hover:bg-slate-100"
               }`}
             >
               {plan.cta}
@@ -195,18 +195,18 @@ export default function PricingPage() {
       {/* FAQ-like section */}
       <div className="text-center">
         <div className="glass-card p-8 max-w-2xl mx-auto">
-          <Users size={24} className="text-indigo-400 mx-auto mb-4" />
-          <h2 className="text-xl font-bold mb-2">
+          <Users size={24} className="text-teal-600 mx-auto mb-4" />
+          <h2 className="text-xl font-bold text-slate-800 mb-2">
             Need a Custom Solution?
           </h2>
-          <p className="text-slate-400 text-sm mb-4">
+          <p className="text-slate-500 text-sm mb-4">
             Enterprise brokerages, franchise networks, and tech partners — we
             offer custom integrations, volume pricing, and white-label
             deployments.
           </p>
           <a
             href="mailto:support@kevv.ai?subject=Custom Smart Value Inquiry"
-            className="text-indigo-400 hover:text-indigo-300 font-medium text-sm inline-flex items-center gap-1"
+            className="text-teal-600 hover:text-teal-700 font-medium text-sm inline-flex items-center gap-1"
           >
             Contact our team
             <ArrowRight size={14} />

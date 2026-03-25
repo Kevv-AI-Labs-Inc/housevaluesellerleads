@@ -151,32 +151,6 @@ export default function HomePage() {
 
   return (
     <div className="relative min-h-screen">
-      {/* Hero Background Orbs */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-        <div
-          className="absolute rounded-full blur-3xl opacity-20"
-          style={{
-            width: 600,
-            height: 600,
-            top: "-10%",
-            right: "-10%",
-            background:
-              "radial-gradient(circle, rgba(99,102,241,0.4), transparent 70%)",
-          }}
-        />
-        <div
-          className="absolute rounded-full blur-3xl opacity-15"
-          style={{
-            width: 500,
-            height: 500,
-            bottom: "10%",
-            left: "-5%",
-            background:
-              "radial-gradient(circle, rgba(6,182,212,0.3), transparent 70%)",
-          }}
-        />
-      </div>
-
       <main className="relative z-10 max-w-4xl mx-auto px-4 py-8 md:py-16">
         {/* Header */}
         <motion.header
@@ -186,7 +160,7 @@ export default function HomePage() {
         >
           <div className="flex items-center justify-between mb-6">
             <div /> {/* Spacer */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-sm font-medium">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-teal-50 border border-teal-200 text-teal-700 text-sm font-medium">
               <Sparkles size={14} />
               {t("header.badge")}
             </div>
@@ -208,24 +182,24 @@ export default function HomePage() {
                 <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight mb-6">
                   <span className="gradient-text">{t("hero.title1")}</span>
                   <br />
-                  <span className="text-white">{t("hero.title2")}</span>
+                  <span className="text-slate-800">{t("hero.title2")}</span>
                 </h1>
-                <p className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed">
+                <p className="text-lg md:text-xl text-slate-500 max-w-2xl mx-auto leading-relaxed">
                   {t("hero.subtitle")}
                 </p>
               </div>
 
               {/* Address Input Card */}
-              <div className="glass-card p-8 md:p-10 max-w-2xl mx-auto pulse-glow">
+              <div className="glass-card p-8 md:p-10 max-w-2xl mx-auto">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 rounded-xl bg-indigo-500/15 flex items-center justify-center">
-                    <MapPin size={20} className="text-indigo-400" />
+                  <div className="w-10 h-10 rounded-xl bg-teal-50 flex items-center justify-center">
+                    <MapPin size={20} className="text-teal-600" />
                   </div>
                   <div>
-                    <h2 className="text-lg font-semibold text-white">
+                    <h2 className="text-lg font-semibold text-slate-800">
                       {t("input.label")}
                     </h2>
-                    <p className="text-sm text-slate-500">
+                    <p className="text-sm text-slate-400">
                       {t("input.sublabel")}
                     </p>
                   </div>
@@ -247,7 +221,7 @@ export default function HomePage() {
                     <motion.p
                       initial={{ opacity: 0, y: -5 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="text-red-400 text-sm"
+                      className="text-red-500 text-sm"
                     >
                       {error}
                     </motion.p>
@@ -271,9 +245,9 @@ export default function HomePage() {
                   ].map((feature) => (
                     <div
                       key={feature.label}
-                      className="flex flex-col items-center gap-2 p-3 rounded-xl bg-white/[0.02] border border-white/[0.04]"
+                      className="flex flex-col items-center gap-2 p-3 rounded-xl bg-slate-50 border border-slate-100"
                     >
-                      <feature.icon size={18} className="text-indigo-400" />
+                      <feature.icon size={18} className="text-teal-600" />
                       <span className="text-xs text-slate-500">
                         {feature.label}
                       </span>
@@ -283,17 +257,17 @@ export default function HomePage() {
               </div>
 
               {/* Trust indicators */}
-              <div className="flex items-center justify-center gap-6 mt-8 text-slate-600 text-sm">
+              <div className="flex items-center justify-center gap-6 mt-8 text-slate-400 text-sm">
                 <span className="flex items-center gap-1">
-                  <CheckCircle2 size={14} className="text-emerald-500/60" />
+                  <CheckCircle2 size={14} className="text-emerald-500" />
                   {t("trust.free")}
                 </span>
                 <span className="flex items-center gap-1">
-                  <CheckCircle2 size={14} className="text-emerald-500/60" />
+                  <CheckCircle2 size={14} className="text-emerald-500" />
                   {t("trust.fast")}
                 </span>
                 <span className="flex items-center gap-1">
-                  <CheckCircle2 size={14} className="text-emerald-500/60" />
+                  <CheckCircle2 size={14} className="text-emerald-500" />
                   {t("trust.safe")}
                 </span>
               </div>
@@ -311,17 +285,17 @@ export default function HomePage() {
               className="flex flex-col items-center justify-center py-20 relative"
             >
               <div className="relative mb-8">
-                <div className="w-20 h-20 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center">
+                <div className="w-20 h-20 rounded-2xl bg-teal-50 border border-teal-200 flex items-center justify-center">
                   <Loader2
                     size={32}
-                    className="text-indigo-400 animate-spin"
+                    className="text-teal-600 animate-spin"
                   />
                 </div>
-                <div className="absolute -top-1 -right-1 w-4 h-4 bg-cyan-400 rounded-full animate-ping" />
+                <div className="absolute -top-1 -right-1 w-4 h-4 bg-teal-400 rounded-full animate-ping" />
               </div>
 
-              <h2 className="text-2xl font-bold mb-3">{t("loading.title")}</h2>
-              <p className="text-slate-400 mb-8 text-center max-w-md">
+              <h2 className="text-2xl font-bold text-slate-800 mb-3">{t("loading.title")}</h2>
+              <p className="text-slate-500 mb-8 text-center max-w-md">
                 {t("loading.subtitle", { address: submittedAddress })}
               </p>
 
@@ -345,9 +319,9 @@ export default function HomePage() {
                       animate={{ scale: 1 }}
                       transition={{ delay: i * 0.6 + 0.3 }}
                     >
-                      <CheckCircle2 size={16} className="text-emerald-400" />
+                      <CheckCircle2 size={16} className="text-emerald-500" />
                     </motion.div>
-                    <span className="text-slate-400">{step}</span>
+                    <span className="text-slate-500">{step}</span>
                   </motion.div>
                 ))}
               </div>
@@ -359,7 +333,7 @@ export default function HomePage() {
                   setViewState("input");
                   setError("");
                 }}
-                className="mt-8 text-slate-500 hover:text-red-400 text-sm transition-colors inline-flex items-center gap-1"
+                className="mt-8 text-slate-400 hover:text-red-500 text-sm transition-colors inline-flex items-center gap-1"
               >
                 <X size={14} />
                 {locale === "zh" ? "取消" : "Cancel"}
@@ -402,7 +376,7 @@ export default function HomePage() {
                 <h1 className="text-3xl md:text-4xl font-extrabold mb-2">
                   <span className="gradient-text">{t("report.title")}</span>
                 </h1>
-                <p className="text-slate-400 flex items-center justify-center gap-2">
+                <p className="text-slate-500 flex items-center justify-center gap-2">
                   <MapPin size={14} />
                   {submittedAddress}
                 </p>
@@ -410,14 +384,14 @@ export default function HomePage() {
 
               {/* Main Value Card */}
               <motion.div
-                className="glass-card p-8 text-center pulse-glow"
+                className="glass-card p-8 text-center"
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.1 }}
               >
                 <div className="flex items-center justify-center gap-2 mb-4">
-                  <Home size={20} className="text-indigo-400" />
-                  <span className="text-slate-400 text-sm font-medium">
+                  <Home size={20} className="text-teal-600" />
+                  <span className="text-slate-500 text-sm font-medium">
                     {t("report.estimatedValue")}
                   </span>
                 </div>
@@ -425,7 +399,7 @@ export default function HomePage() {
                   {formatFullPrice(valuation.estimatedValueLow)} —{" "}
                   {formatFullPrice(valuation.estimatedValueHigh)}
                 </div>
-                <p className="text-slate-500 text-sm mb-6">
+                <p className="text-slate-400 text-sm mb-6">
                   {t("report.bestEstimate")}:{" "}
                   {formatFullPrice(valuation.estimatedValue)}
                 </p>
@@ -455,7 +429,7 @@ export default function HomePage() {
                 transition={{ delay: 0.2 }}
               >
                 <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                  <Building2 size={18} className="text-indigo-400" />
+                  <Building2 size={18} className="text-teal-600" />
                   {t("report.propertyInfo")}
                 </h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -487,12 +461,12 @@ export default function HomePage() {
                   ].map((item) => (
                     <div
                       key={item.label}
-                      className="p-3 rounded-xl bg-white/[0.02]"
+                      className="p-3 rounded-xl bg-slate-50"
                     >
-                      <p className="text-xs text-slate-500 mb-1">
+                      <p className="text-xs text-slate-400 mb-1">
                         {item.label}
                       </p>
-                      <p className="text-sm font-semibold text-slate-200">
+                      <p className="text-sm font-semibold text-slate-700">
                         {item.value}
                       </p>
                     </div>
@@ -508,17 +482,17 @@ export default function HomePage() {
                 transition={{ delay: 0.3 }}
               >
                 <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                  <BarChart3 size={18} className="text-cyan-400" />
+                  <BarChart3 size={18} className="text-teal-500" />
                   {t("report.comps")}
                 </h3>
                 <div className="space-y-2">
                   {valuation.comparableSales.map((comp, i) => (
                     <div key={i} className="comp-row">
                       <div>
-                        <p className="text-sm font-medium text-slate-200">
+                        <p className="text-sm font-medium text-slate-700">
                           {comp.address}
                         </p>
-                        <p className="text-xs text-slate-500">
+                        <p className="text-xs text-slate-400">
                           {comp.beds}
                           {locale === "zh" ? "卧" : "bd"} ·{" "}
                           {comp.baths}
@@ -526,10 +500,10 @@ export default function HomePage() {
                           {comp.sqft.toLocaleString()} sqft
                         </p>
                       </div>
-                      <span className="text-sm font-bold text-indigo-300">
+                      <span className="text-sm font-bold text-teal-700">
                         {formatPrice(comp.price)}
                       </span>
-                      <span className="text-xs text-slate-500">
+                      <span className="text-xs text-slate-400">
                         {comp.date}
                       </span>
                     </div>
@@ -545,10 +519,10 @@ export default function HomePage() {
                 transition={{ delay: 0.35 }}
               >
                 <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                  <TrendingUp size={18} className="text-emerald-400" />
+                  <TrendingUp size={18} className="text-emerald-600" />
                   {t("report.marketTrend")}
                 </h3>
-                <p className="text-slate-300 text-sm leading-relaxed">
+                <p className="text-slate-600 text-sm leading-relaxed">
                   {valuation.marketSummary}
                 </p>
                 <div className="mt-3">
@@ -579,7 +553,7 @@ export default function HomePage() {
               <div className="text-center pt-4">
                 <button
                   onClick={resetAll}
-                  className="text-slate-500 hover:text-indigo-400 text-sm transition-colors inline-flex items-center gap-2"
+                  className="text-slate-400 hover:text-teal-600 text-sm transition-colors inline-flex items-center gap-2"
                 >
                   <Search size={14} />
                   {t("report.newValuation")}
@@ -590,14 +564,14 @@ export default function HomePage() {
         </AnimatePresence>
 
         {/* Footer */}
-        <footer className="text-center mt-16 pb-8 text-slate-600 text-xs">
+        <footer className="text-center mt-16 pb-8 text-slate-400 text-xs">
           <p>{t("footer.disclaimer")}</p>
           <p className="mt-2 flex items-center justify-center gap-3">
-            <Link href="/privacy" className="hover:text-indigo-400 transition-colors">
+            <Link href="/privacy" className="hover:text-teal-600 transition-colors">
               Privacy Policy
             </Link>
             <span>·</span>
-            <Link href="/pricing" className="hover:text-indigo-400 transition-colors">
+            <Link href="/pricing" className="hover:text-teal-600 transition-colors">
               For Agents
             </Link>
           </p>

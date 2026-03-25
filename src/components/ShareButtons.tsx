@@ -112,7 +112,7 @@ export function ShareButtons({
       transition={{ delay: 0.45 }}
     >
       <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-        <Share2 size={18} className="text-indigo-400" />
+        <Share2 size={18} className="text-teal-600" />
         {t("share.title")}
       </h3>
       <div className="flex flex-wrap gap-3">

@@ -120,7 +120,7 @@ export function AgentCTA({ agentSlug, address, estimatedValue }: AgentCTAProps) 
             <div className="agent-cta-header">
               <div className="agent-cta-avatar">
                 {isAgentLinked ? (
-                  <span className="text-lg font-bold text-white">
+                  <span className="text-lg font-bold text-white/90">
                     {agentSlug.charAt(0).toUpperCase()}
                   </span>
                 ) : (
@@ -128,12 +128,12 @@ export function AgentCTA({ agentSlug, address, estimatedValue }: AgentCTAProps) 
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="text-sm font-bold text-white truncate">
+                <h3 className="text-sm font-bold text-slate-800 truncate">
                   {isAgentLinked
                     ? t("agent.linked.title")
                     : t("agent.generic.title")}
                 </h3>
-                <p className="text-xs text-slate-400 truncate">
+                <p className="text-xs text-slate-500 truncate">
                   {isAgentLinked
                     ? t("agent.linked.subtitle")
                     : t("agent.generic.subtitle")}
@@ -156,13 +156,13 @@ export function AgentCTA({ agentSlug, address, estimatedValue }: AgentCTAProps) 
             {/* Context */}
             {estimatedValue && (
               <div className="agent-cta-context">
-                <span className="text-xs text-slate-500">
+                <span className="text-xs text-slate-400">
                   {t("agent.about")}
                 </span>
-                <span className="text-xs font-semibold text-indigo-300 truncate">
+                <span className="text-xs font-semibold text-slate-700 truncate">
                   {address}
                 </span>
-                <span className="text-xs font-bold text-emerald-400">
+                <span className="text-xs font-bold text-teal-700">
                   {estimatedValue}
                 </span>
               </div>
@@ -217,7 +217,7 @@ export function AgentCTA({ agentSlug, address, estimatedValue }: AgentCTAProps) 
                   <div className="flex gap-2">
                     <button
                       onClick={() => setShowSchedule(false)}
-                      className="flex-1 text-xs text-slate-500 hover:text-slate-300 py-2 transition-colors"
+                      className="flex-1 text-xs text-slate-400 hover:text-slate-600 py-2 transition-colors"
                     >
                       {locale === "zh" ? "返回" : "Back"}
                     </button>
@@ -244,10 +244,10 @@ export function AgentCTA({ agentSlug, address, estimatedValue }: AgentCTAProps) 
                       className="text-emerald-400"
                     />
                   </div>
-                  <p className="text-sm font-semibold text-white mb-1">
+                  <p className="text-sm font-semibold text-slate-800 mb-1">
                     {t("agent.schedule.confirmed")}
                   </p>
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs text-slate-500">
                     {t("agent.schedule.confirmedSub")}
                   </p>
                 </motion.div>
@@ -303,7 +303,7 @@ export function AgentCTA({ agentSlug, address, estimatedValue }: AgentCTAProps) 
               <div className="text-center pt-1 pb-2">
                 <button
                   onClick={() => setShowSchedule(true)}
-                  className="text-[10px] text-slate-500 hover:text-indigo-400 transition-colors inline-flex items-center gap-1"
+                  className="text-[10px] text-slate-400 hover:text-teal-600 transition-colors inline-flex items-center gap-1"
                 >
                   <ChevronUp size={10} />
                   {t("agent.cta.teaser")}
