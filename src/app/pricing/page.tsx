@@ -97,7 +97,7 @@ const highlights = [
 
 export default function PricingPage() {
   return (
-    <div className="max-w-5xl mx-auto px-4 py-16">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10 sm:py-16">
       <Link
         href="/"
         className="inline-flex items-center gap-2 text-slate-400 hover:text-teal-600 transition-colors mb-8"
@@ -107,24 +107,24 @@ export default function PricingPage() {
       </Link>
 
       {/* Header */}
-      <div className="text-center mb-16">
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-50 border border-amber-200 text-amber-700 text-sm font-medium mb-6">
+      <div className="text-center mb-10 sm:mb-16">
+        <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-amber-50 border border-amber-200 text-amber-700 text-xs sm:text-sm font-medium mb-4 sm:mb-6">
           <Sparkles size={14} />
           For Real Estate Agents
         </div>
-        <h1 className="text-4xl md:text-5xl font-extrabold mb-4">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-3 sm:mb-4">
           <span className="gradient-text">Turn Every Visitor</span>
           <br />
           <span className="text-slate-800">Into a Seller Lead</span>
         </h1>
-        <p className="text-slate-500 text-lg max-w-2xl mx-auto">
+        <p className="text-slate-500 text-base sm:text-lg max-w-2xl mx-auto px-2 sm:px-0">
           Get your own AI-powered home valuation page. Homeowners enter their
           address, get a free valuation, and become your leads — automatically.
         </p>
       </div>
 
       {/* Value Props */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-10 sm:mb-16">
         {highlights.map((h) => (
           <div
             key={h.title}
@@ -140,7 +140,7 @@ export default function PricingPage() {
       </div>
 
       {/* Pricing Cards */}
-      <div className="grid md:grid-cols-3 gap-6 mb-16">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6 mb-10 sm:mb-16">
         {plans.map((plan) => (
           <div
             key={plan.name}
@@ -194,7 +194,7 @@ export default function PricingPage() {
 
       {/* FAQ-like section */}
       <div className="text-center">
-        <div className="glass-card p-8 max-w-2xl mx-auto">
+        <div className="glass-card p-5 sm:p-8 max-w-2xl mx-auto">
           <Users size={24} className="text-teal-600 mx-auto mb-4" />
           <h2 className="text-xl font-bold text-slate-800 mb-2">
             Need a Custom Solution?

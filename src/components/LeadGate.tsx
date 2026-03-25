@@ -89,7 +89,7 @@ export function LeadGate({
       className="max-w-lg mx-auto"
     >
       {/* Blurred preview of value */}
-      <div className="glass-card p-8 text-center mb-6 relative overflow-hidden">
+      <div className="glass-card p-5 sm:p-8 text-center mb-4 sm:mb-6 relative overflow-hidden">
         <div className="flex items-center justify-center gap-2 mb-3">
           <Home size={18} className="text-teal-600" />
           <span className="text-slate-500 text-sm font-medium">

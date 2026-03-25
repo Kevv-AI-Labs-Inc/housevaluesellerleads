@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function PrivacyPage() {
   return (
-    <div className="max-w-3xl mx-auto px-4 py-16">
+    <div className="max-w-3xl mx-auto px-4 sm:px-6 py-10 sm:py-16">
       <Link
         href="/"
         className="inline-flex items-center gap-2 text-slate-400 hover:text-teal-600 transition-colors mb-8"
@@ -24,7 +24,7 @@ export default function PrivacyPage() {
           <Shield size={24} className="text-teal-600" />
         </div>
         <div>
-          <h1 className="text-3xl font-bold">Privacy Policy</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold">Privacy Policy</h1>
           <p className="text-slate-500 text-sm">
             Last updated: March 2026
           </p>

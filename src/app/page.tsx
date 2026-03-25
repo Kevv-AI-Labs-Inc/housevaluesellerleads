@@ -151,17 +151,18 @@ export default function HomePage() {
 
   return (
     <div className="relative min-h-screen">
-      <main className="relative z-10 max-w-4xl mx-auto px-4 py-8 md:py-16">
+      <main className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 py-6 md:py-16">
         {/* Header */}
         <motion.header
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-4"
         >
-          <div className="flex items-center justify-between mb-6">
-            <div /> {/* Spacer */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-teal-50 border border-teal-200 text-teal-700 text-sm font-medium">
-              <Sparkles size={14} />
+          <div className="flex items-center justify-between mb-4 md:mb-6">
+            <div className="hidden sm:block" /> {/* Spacer */}
+            <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-teal-50 border border-teal-200 text-teal-700 text-xs sm:text-sm font-medium">
+              <Sparkles size={12} className="sm:hidden" />
+              <Sparkles size={14} className="hidden sm:block" />
               {t("header.badge")}
             </div>
             <LanguageSwitcher />
@@ -178,19 +179,19 @@ export default function HomePage() {
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.4 }}
             >
-              <div className="text-center mb-12">
-                <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight mb-6">
+              <div className="text-center mb-8 md:mb-12">
+                <h1 className="text-3xl sm:text-4xl md:text-6xl font-extrabold tracking-tight mb-4 md:mb-6">
                   <span className="gradient-text">{t("hero.title1")}</span>
                   <br />
                   <span className="text-slate-800">{t("hero.title2")}</span>
                 </h1>
-                <p className="text-lg md:text-xl text-slate-500 max-w-2xl mx-auto leading-relaxed">
+                <p className="text-base sm:text-lg md:text-xl text-slate-500 max-w-2xl mx-auto leading-relaxed px-2 sm:px-0">
                   {t("hero.subtitle")}
                 </p>
               </div>
 
               {/* Address Input Card */}
-              <div className="glass-card p-8 md:p-10 max-w-2xl mx-auto">
+              <div className="glass-card p-5 sm:p-8 md:p-10 max-w-2xl mx-auto">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="w-10 h-10 rounded-xl bg-teal-50 flex items-center justify-center">
                     <MapPin size={20} className="text-teal-600" />
@@ -237,7 +238,7 @@ export default function HomePage() {
                 </div>
 
                 {/* Features */}
-                <div className="grid grid-cols-3 gap-3 mt-8">
+                <div className="grid grid-cols-3 gap-2 sm:gap-3 mt-6 sm:mt-8">
                   {[
                     { icon: BarChart3, label: t("input.feature.market") },
                     { icon: Building2, label: t("input.feature.comps") },
@@ -245,10 +246,10 @@ export default function HomePage() {
                   ].map((feature) => (
                     <div
                       key={feature.label}
-                      className="flex flex-col items-center gap-2 p-3 rounded-xl bg-slate-50 border border-slate-100"
+                      className="flex flex-col items-center gap-1.5 sm:gap-2 p-2 sm:p-3 rounded-xl bg-slate-50 border border-slate-100"
                     >
-                      <feature.icon size={18} className="text-teal-600" />
-                      <span className="text-xs text-slate-500">
+                      <feature.icon size={16} className="text-teal-600 sm:w-[18px] sm:h-[18px]" />
+                      <span className="text-[11px] sm:text-xs text-slate-500 text-center leading-tight">
                         {feature.label}
                       </span>
                     </div>
@@ -257,17 +258,17 @@ export default function HomePage() {
               </div>
 
               {/* Trust indicators */}
-              <div className="flex items-center justify-center gap-6 mt-8 text-slate-400 text-sm">
+              <div className="flex items-center justify-center gap-3 sm:gap-6 mt-6 sm:mt-8 text-slate-400 text-xs sm:text-sm flex-wrap">
                 <span className="flex items-center gap-1">
-                  <CheckCircle2 size={14} className="text-emerald-500" />
+                  <CheckCircle2 size={12} className="text-emerald-500 sm:w-[14px] sm:h-[14px]" />
                   {t("trust.free")}
                 </span>
                 <span className="flex items-center gap-1">
-                  <CheckCircle2 size={14} className="text-emerald-500" />
+                  <CheckCircle2 size={12} className="text-emerald-500 sm:w-[14px] sm:h-[14px]" />
                   {t("trust.fast")}
                 </span>
                 <span className="flex items-center gap-1">
-                  <CheckCircle2 size={14} className="text-emerald-500" />
+                  <CheckCircle2 size={12} className="text-emerald-500 sm:w-[14px] sm:h-[14px]" />
                   {t("trust.safe")}
                 </span>
               </div>
@@ -372,19 +373,19 @@ export default function HomePage() {
               className="space-y-6"
             >
               {/* Report Header */}
-              <div className="text-center mb-8">
-                <h1 className="text-3xl md:text-4xl font-extrabold mb-2">
+              <div className="text-center mb-6 md:mb-8">
+                <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold mb-2">
                   <span className="gradient-text">{t("report.title")}</span>
                 </h1>
-                <p className="text-slate-500 flex items-center justify-center gap-2">
-                  <MapPin size={14} />
-                  {submittedAddress}
+                <p className="text-slate-500 flex items-center justify-center gap-2 text-sm sm:text-base px-2">
+                  <MapPin size={14} className="shrink-0" />
+                  <span className="truncate">{submittedAddress}</span>
                 </p>
               </div>
 
               {/* Main Value Card */}
               <motion.div
-                className="glass-card p-8 text-center"
+                className="glass-card p-5 sm:p-8 text-center"
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.1 }}
@@ -432,7 +433,7 @@ export default function HomePage() {
                   <Building2 size={18} className="text-teal-600" />
                   {t("report.propertyInfo")}
                 </h3>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
                   {[
                     {
                       label: t("report.beds"),
@@ -564,7 +565,7 @@ export default function HomePage() {
         </AnimatePresence>
 
         {/* Footer */}
-        <footer className="text-center mt-16 pb-8 text-slate-400 text-xs">
+        <footer className="text-center mt-10 sm:mt-16 pb-6 sm:pb-8 text-slate-400 text-xs">
           <p>{t("footer.disclaimer")}</p>
           <p className="mt-2 flex items-center justify-center gap-3">
             <Link href="/privacy" className="hover:text-teal-600 transition-colors">
