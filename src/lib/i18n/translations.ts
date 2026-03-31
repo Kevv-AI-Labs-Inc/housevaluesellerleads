@@ -199,16 +199,16 @@ export const translations = {
     en: "Market Trend Analysis",
   },
   "report.trend.rising": {
-    zh: "📈 上涨",
-    en: "📈 Rising",
+    zh: "上涨",
+    en: "Rising",
   },
   "report.trend.stable": {
-    zh: "📊 稳定",
-    en: "📊 Stable",
+    zh: "稳定",
+    en: "Stable",
   },
   "report.trend.declining": {
-    zh: "📉 下降",
-    en: "📉 Declining",
+    zh: "下降",
+    en: "Declining",
   },
   "report.trendLabel": {
     zh: "区域趋势",

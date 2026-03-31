@@ -5,6 +5,7 @@ import Link from "next/link";
 import {
   MapPin,
   TrendingUp,
+  TrendingDown,
   Home,
   Search,
   Star,
@@ -12,9 +13,10 @@ import {
   BarChart3,
   GraduationCap,
   X,
-  Loader2,
   CheckCircle2,
-  Sparkles,
+  ArrowRight,
+  Activity,
+  Minus,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useI18n } from "@/lib/i18n";
@@ -53,6 +55,20 @@ interface ValuationData {
 
 type ViewState = "input" | "loading" | "gate" | "report";
 
+/* ─── Spring physics preset (per skill §4) ─────────────── */
+const springTransition = { type: "spring" as const, stiffness: 100, damping: 20 };
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: { staggerChildren: 0.08, ...springTransition },
+  },
+};
+const staggerItem = {
+  hidden: { opacity: 0, y: 16 },
+  show: { opacity: 1, y: 0, transition: springTransition },
+};
+
 export default function HomePage() {
   const { t, locale } = useI18n();
   const [address, setAddress] = useState("");
@@ -63,7 +79,6 @@ export default function HomePage() {
   const [agentSlug, setAgentSlug] = useState("");
   const abortRef = useRef<AbortController | null>(null);
 
-  // Read ?agent=xxx from URL on mount
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const agent = params.get("agent");
@@ -80,10 +95,9 @@ export default function HomePage() {
     setSubmittedAddress(address.trim());
     setViewState("loading");
 
-    // Create abort controller for timeout + cancel
     const controller = new AbortController();
     abortRef.current = controller;
-    const timeout = setTimeout(() => controller.abort(), 60_000); // 60s
+    const timeout = setTimeout(() => controller.abort(), 60_000);
 
     try {
       const res = await fetch("/api/valuation", {
@@ -105,7 +119,6 @@ export default function HomePage() {
       }
 
       setValuation(data.valuation);
-      // Go to gate instead of report
       setViewState("gate");
     } catch (err) {
       if (err instanceof DOMException && err.name === "AbortError") {
@@ -150,157 +163,178 @@ export default function HomePage() {
   };
 
   return (
-    <div className="relative min-h-screen">
-      <main className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 py-6 md:py-16">
-        {/* Header */}
+    <div className="relative min-h-[100dvh]">
+      {/* Mesh gradient background — fixed, no repaints */}
+      <div className="mesh-bg" />
+
+      <main className="relative z-10 max-w-[1100px] mx-auto px-4 sm:px-6 py-6 md:py-12">
+        {/* ─── Header ─────────────────────────────────────── */}
         <motion.header
-          initial={{ opacity: 0, y: -20 }}
+          initial={{ opacity: 0, y: -12 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-4"
+          transition={springTransition}
+          className="flex items-center justify-between mb-6 md:mb-10"
         >
-          <div className="flex items-center justify-between mb-4 md:mb-6">
-            <div className="hidden sm:block" /> {/* Spacer */}
-            <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-teal-50 border border-teal-200 text-teal-700 text-xs sm:text-sm font-medium">
-              <Sparkles size={12} className="sm:hidden" />
-              <Sparkles size={14} className="hidden sm:block" />
-              {t("header.badge")}
-            </div>
-            <LanguageSwitcher />
+          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-zinc-100 border border-zinc-200 text-zinc-600 text-xs font-medium">
+            <Activity size={12} />
+            {t("header.badge")}
           </div>
+          <LanguageSwitcher />
         </motion.header>
 
         <AnimatePresence mode="wait">
-          {/* ======== INPUT STATE ======== */}
+          {/* ════════ INPUT STATE ════════ */}
           {viewState === "input" && (
             <motion.div
               key="input"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.4 }}
+              transition={springTransition}
             >
-              <div className="text-center mb-8 md:mb-12">
-                <h1 className="text-3xl sm:text-4xl md:text-6xl font-extrabold tracking-tight mb-4 md:mb-6">
-                  <span className="gradient-text">{t("hero.title1")}</span>
-                  <br />
-                  <span className="text-slate-800">{t("hero.title2")}</span>
-                </h1>
-                <p className="text-base sm:text-lg md:text-xl text-slate-500 max-w-2xl mx-auto leading-relaxed px-2 sm:px-0">
-                  {t("hero.subtitle")}
-                </p>
-              </div>
+              {/* Split-screen hero: Left text / Right input card */}
+              <div className="grid grid-cols-1 md:grid-cols-[1fr,1.1fr] gap-8 md:gap-12 items-start">
+                {/* Left — headline + trust */}
+                <div className="pt-2 md:pt-8">
+                  <h1 className="heading-display text-3xl sm:text-4xl md:text-[3.25rem] mb-4 md:mb-6">
+                    {t("hero.title1")}
+                    <br />
+                    <span className="text-zinc-500">{t("hero.title2")}</span>
+                  </h1>
+                  <p className="body-text text-base sm:text-lg mb-6 md:mb-8">
+                    {t("hero.subtitle")}
+                  </p>
 
-              {/* Address Input Card */}
-              <div className="glass-card p-5 sm:p-8 md:p-10 max-w-2xl mx-auto">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 rounded-xl bg-teal-50 flex items-center justify-center">
-                    <MapPin size={20} className="text-teal-600" />
-                  </div>
-                  <div>
-                    <h2 className="text-lg font-semibold text-slate-800">
-                      {t("input.label")}
-                    </h2>
-                    <p className="text-sm text-slate-400">
-                      {t("input.sublabel")}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <AddressAutocomplete
-                    value={address}
-                    onChange={(val) => {
-                      setAddress(val);
-                      setError("");
-                    }}
-                    onSelect={(place) => setAddress(place.formatted)}
-                    placeholder={t("input.placeholder")}
-                    onKeyDown={(e) => e.key === "Enter" && handleValuation()}
-                  />
-
-                  {error && (
-                    <motion.p
-                      initial={{ opacity: 0, y: -5 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="text-red-500 text-sm"
-                    >
-                      {error}
-                    </motion.p>
-                  )}
-
-                  <button
-                    onClick={handleValuation}
-                    className="btn-primary w-full flex items-center justify-center gap-2"
-                  >
-                    <Search size={18} />
-                    {t("input.button")}
-                  </button>
-                </div>
-
-                {/* Features */}
-                <div className="grid grid-cols-3 gap-2 sm:gap-3 mt-6 sm:mt-8">
-                  {[
-                    { icon: BarChart3, label: t("input.feature.market") },
-                    { icon: Building2, label: t("input.feature.comps") },
-                    { icon: GraduationCap, label: t("input.feature.school") },
-                  ].map((feature) => (
-                    <div
-                      key={feature.label}
-                      className="flex flex-col items-center gap-1.5 sm:gap-2 p-2 sm:p-3 rounded-xl bg-slate-50 border border-slate-100"
-                    >
-                      <feature.icon size={16} className="text-teal-600 sm:w-[18px] sm:h-[18px]" />
-                      <span className="text-[11px] sm:text-xs text-slate-500 text-center leading-tight">
-                        {feature.label}
+                  {/* Trust indicators — inline, subtle */}
+                  <div className="flex flex-col gap-2.5">
+                    {[
+                      { text: t("trust.free") },
+                      { text: t("trust.fast") },
+                      { text: t("trust.safe") },
+                    ].map((item) => (
+                      <span
+                        key={item.text}
+                        className="flex items-center gap-2 text-sm text-zinc-400"
+                      >
+                        <CheckCircle2 size={14} className="text-emerald-500" />
+                        {item.text}
                       </span>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
-              </div>
 
-              {/* Trust indicators */}
-              <div className="flex items-center justify-center gap-3 sm:gap-6 mt-6 sm:mt-8 text-slate-400 text-xs sm:text-sm flex-wrap">
-                <span className="flex items-center gap-1">
-                  <CheckCircle2 size={12} className="text-emerald-500 sm:w-[14px] sm:h-[14px]" />
-                  {t("trust.free")}
-                </span>
-                <span className="flex items-center gap-1">
-                  <CheckCircle2 size={12} className="text-emerald-500 sm:w-[14px] sm:h-[14px]" />
-                  {t("trust.fast")}
-                </span>
-                <span className="flex items-center gap-1">
-                  <CheckCircle2 size={12} className="text-emerald-500 sm:w-[14px] sm:h-[14px]" />
-                  {t("trust.safe")}
-                </span>
+                {/* Right — address input panel */}
+                <motion.div
+                  className="glass-panel p-6 sm:p-8"
+                  initial={{ opacity: 0, y: 24 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ ...springTransition, delay: 0.1 }}
+                >
+                  <div className="flex items-center gap-3 mb-5">
+                    <div className="w-10 h-10 rounded-xl bg-zinc-100 flex items-center justify-center">
+                      <MapPin size={18} className="text-zinc-600" />
+                    </div>
+                    <div>
+                      <h2 className="text-base font-semibold text-zinc-800">
+                        {t("input.label")}
+                      </h2>
+                      <p className="text-xs text-zinc-400">
+                        {t("input.sublabel")}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <AddressAutocomplete
+                      value={address}
+                      onChange={(val) => {
+                        setAddress(val);
+                        setError("");
+                      }}
+                      onSelect={(place) => setAddress(place.formatted)}
+                      placeholder={t("input.placeholder")}
+                      onKeyDown={(e) => e.key === "Enter" && handleValuation()}
+                    />
+
+                    {error && (
+                      <motion.p
+                        initial={{ opacity: 0, y: -5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="text-red-500 text-sm"
+                      >
+                        {error}
+                      </motion.p>
+                    )}
+
+                    <button
+                      onClick={handleValuation}
+                      className="btn-primary w-full flex items-center justify-center gap-2"
+                    >
+                      <Search size={16} />
+                      {t("input.button")}
+                    </button>
+                  </div>
+
+                  {/* Features — 2 item zig-zag, not 3-col grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6">
+                    {[
+                      { icon: BarChart3, label: t("input.feature.market"), desc: locale === "zh" ? "实时数据驱动" : "Real-time data" },
+                      { icon: Building2, label: t("input.feature.comps"), desc: locale === "zh" ? "近期成交对比" : "Recent sales" },
+                      { icon: GraduationCap, label: t("input.feature.school"), desc: locale === "zh" ? "学区综合评分" : "Comprehensive" },
+                    ].map((feature) => (
+                      <div
+                        key={feature.label}
+                        className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-zinc-50 border border-zinc-100"
+                      >
+                        <feature.icon size={16} className="text-emerald-600 shrink-0" />
+                        <div>
+                          <span className="text-xs font-medium text-zinc-700">{feature.label}</span>
+                          <span className="text-[10px] text-zinc-400 ml-1.5">{feature.desc}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
               </div>
             </motion.div>
           )}
 
-          {/* ======== LOADING STATE ======== */}
+          {/* ════════ LOADING STATE ════════ */}
           {viewState === "loading" && (
             <motion.div
               key="loading"
-              initial={{ opacity: 0, scale: 0.95 }}
+              initial={{ opacity: 0, scale: 0.97 }}
               animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              transition={{ duration: 0.4 }}
-              className="flex flex-col items-center justify-center py-20 relative"
+              exit={{ opacity: 0, scale: 0.97 }}
+              transition={springTransition}
+              className="flex flex-col items-center justify-center py-16 md:py-24 relative"
             >
-              <div className="relative mb-8">
-                <div className="w-20 h-20 rounded-2xl bg-teal-50 border border-teal-200 flex items-center justify-center">
-                  <Loader2
-                    size={32}
-                    className="text-teal-600 animate-spin"
-                  />
+              {/* Skeleton shimmer card instead of spinner */}
+              <div className="w-full max-w-md glass-panel p-6 sm:p-8 mb-8">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="skeleton w-12 h-12 rounded-xl" />
+                  <div className="flex-1 space-y-2">
+                    <div className="skeleton-text w-3/4" />
+                    <div className="skeleton-text w-1/2" style={{ height: "0.75rem" }} />
+                  </div>
                 </div>
-                <div className="absolute -top-1 -right-1 w-4 h-4 bg-teal-400 rounded-full animate-ping" />
+                <div className="skeleton w-full h-10 rounded-xl mb-3" />
+                <div className="skeleton w-2/3 h-6 rounded-lg" />
               </div>
 
-              <h2 className="text-2xl font-bold text-slate-800 mb-3">{t("loading.title")}</h2>
-              <p className="text-slate-500 mb-8 text-center max-w-md">
+              <h2 className="text-xl font-bold text-zinc-800 mb-2 tracking-tight">
+                {t("loading.title")}
+              </h2>
+              <p className="text-zinc-500 mb-6 text-center max-w-md text-sm">
                 {t("loading.subtitle", { address: submittedAddress })}
               </p>
 
-              <div className="w-full max-w-md space-y-3">
+              <motion.div
+                className="w-full max-w-md space-y-3"
+                variants={staggerContainer}
+                initial="hidden"
+                animate="show"
+              >
                 {[
                   t("loading.step1"),
                   t("loading.step2"),
@@ -310,46 +344,44 @@ export default function HomePage() {
                 ].map((step, i) => (
                   <motion.div
                     key={step}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.6 }}
+                    variants={staggerItem}
                     className="flex items-center gap-3 text-sm"
                   >
                     <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ delay: i * 0.6 + 0.3 }}
+                      initial={{ scale: 0, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ delay: i * 0.5 + 0.3, ...springTransition }}
                     >
                       <CheckCircle2 size={16} className="text-emerald-500" />
                     </motion.div>
-                    <span className="text-slate-500">{step}</span>
+                    <span className="text-zinc-500">{step}</span>
                   </motion.div>
                 ))}
-              </div>
+              </motion.div>
 
-              {/* Cancel button */}
+              {/* Cancel — subtle text link */}
               <button
                 onClick={() => {
                   abortRef.current?.abort();
                   setViewState("input");
                   setError("");
                 }}
-                className="mt-8 text-slate-400 hover:text-red-500 text-sm transition-colors inline-flex items-center gap-1"
+                className="mt-8 text-zinc-400 hover:text-red-500 text-xs transition-colors inline-flex items-center gap-1 underline underline-offset-2"
               >
-                <X size={14} />
+                <X size={12} />
                 {locale === "zh" ? "取消" : "Cancel"}
               </button>
             </motion.div>
           )}
 
-          {/* ======== GATE STATE (Lead Capture) ======== */}
+          {/* ════════ GATE STATE (Lead Capture) ════════ */}
           {viewState === "gate" && valuation && (
             <motion.div
               key="gate"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.4 }}
+              transition={springTransition}
             >
               <LeadGate
                 estimatedValue={valuation.estimatedValue}
@@ -363,77 +395,75 @@ export default function HomePage() {
             </motion.div>
           )}
 
-          {/* ======== REPORT STATE ======== */}
+          {/* ════════ REPORT STATE ════════ */}
           {viewState === "report" && valuation && (
             <motion.div
               key="report"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="space-y-6"
+              variants={staggerContainer}
+              initial="hidden"
+              animate="show"
+              className="space-y-0"
             >
               {/* Report Header */}
-              <div className="text-center mb-6 md:mb-8">
-                <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold mb-2">
-                  <span className="gradient-text">{t("report.title")}</span>
+              <motion.div variants={staggerItem} className="mb-6 md:mb-8">
+                <h1 className="heading-display text-2xl sm:text-3xl md:text-4xl mb-2">
+                  {t("report.title")}
                 </h1>
-                <p className="text-slate-500 flex items-center justify-center gap-2 text-sm sm:text-base px-2">
+                <p className="text-zinc-400 flex items-center gap-2 text-sm">
                   <MapPin size={14} className="shrink-0" />
                   <span className="truncate">{submittedAddress}</span>
                 </p>
-              </div>
+              </motion.div>
 
-              {/* Main Value Card */}
+              {/* Main Value — glass panel, NO gradient text */}
               <motion.div
-                className="glass-card p-5 sm:p-8 text-center"
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.1 }}
+                variants={staggerItem}
+                className="glass-panel p-6 sm:p-8 text-center mb-6"
               >
                 <div className="flex items-center justify-center gap-2 mb-4">
-                  <Home size={20} className="text-teal-600" />
-                  <span className="text-slate-500 text-sm font-medium">
+                  <Home size={18} className="text-emerald-600" />
+                  <span className="text-zinc-500 text-sm font-medium">
                     {t("report.estimatedValue")}
                   </span>
                 </div>
-                <div className="value-display gradient-text mb-2">
-                  {formatFullPrice(valuation.estimatedValueLow)} —{" "}
+                <div className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-zinc-900 tracking-tighter mb-2 font-mono-num">
+                  {formatFullPrice(valuation.estimatedValueLow)} &mdash;{" "}
                   {formatFullPrice(valuation.estimatedValueHigh)}
                 </div>
-                <p className="text-slate-400 text-sm mb-6">
+                <p className="text-zinc-400 text-sm mb-6 font-mono-num">
                   {t("report.bestEstimate")}:{" "}
                   {formatFullPrice(valuation.estimatedValue)}
                 </p>
 
                 <div className="flex items-center justify-center gap-3 flex-wrap">
                   <span
-                    className={`stat-badge ${valuation.appreciationRate >= 0 ? "positive" : "neutral"}`}
+                    className={`stat-pill ${valuation.appreciationRate >= 0 ? "positive" : "neutral"}`}
                   >
-                    <TrendingUp size={14} />
+                    {valuation.appreciationRate >= 0 ? (
+                      <TrendingUp size={14} />
+                    ) : (
+                      <TrendingDown size={14} />
+                    )}
                     {valuation.appreciationRate >= 0
                       ? t("report.appreciation.up")
                       : t("report.appreciation.change")}{" "}
-                    {Math.abs(valuation.appreciationRate).toFixed(1)}%
+                    <span className="font-mono-num">{Math.abs(valuation.appreciationRate).toFixed(1)}%</span>
                   </span>
-                  <span className="stat-badge neutral">
+                  <span className="stat-pill neutral">
                     <Star size={14} />
-                    {t("report.schoolRating")}: {valuation.schoolRating}/10
+                    {t("report.schoolRating")}:
+                    <span className="font-mono-num">{valuation.schoolRating}/10</span>
                   </span>
                 </div>
               </motion.div>
 
-              {/* Property Details */}
-              <motion.div
-                className="report-card"
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-              >
-                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                  <Building2 size={18} className="text-teal-600" />
+              {/* Property Details — divider-based, NOT card-boxed */}
+              <motion.div variants={staggerItem} className="section-divided">
+                <h3 className="heading-section text-base mb-4 flex items-center gap-2">
+                  <Building2 size={16} className="text-emerald-600" />
                   {t("report.propertyInfo")}
                 </h3>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-4">
                   {[
                     {
                       label: t("report.beds"),
@@ -460,14 +490,11 @@ export default function HomePage() {
                       value: valuation.propertyDetails.propertyType,
                     },
                   ].map((item) => (
-                    <div
-                      key={item.label}
-                      className="p-3 rounded-xl bg-slate-50"
-                    >
-                      <p className="text-xs text-slate-400 mb-1">
+                    <div key={item.label}>
+                      <p className="text-xs text-zinc-400 mb-0.5">
                         {item.label}
                       </p>
-                      <p className="text-sm font-semibold text-slate-700">
+                      <p className="text-sm font-semibold text-zinc-800 font-mono-num">
                         {item.value}
                       </p>
                     </div>
@@ -475,36 +502,31 @@ export default function HomePage() {
                 </div>
               </motion.div>
 
-              {/* Comparable Sales */}
-              <motion.div
-                className="report-card"
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-              >
-                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                  <BarChart3 size={18} className="text-teal-500" />
+              {/* Comparable Sales — divider-based table rows */}
+              <motion.div variants={staggerItem} className="section-divided">
+                <h3 className="heading-section text-base mb-4 flex items-center gap-2">
+                  <BarChart3 size={16} className="text-emerald-600" />
                   {t("report.comps")}
                 </h3>
-                <div className="space-y-2">
+                <div>
                   {valuation.comparableSales.map((comp, i) => (
                     <div key={i} className="comp-row">
                       <div>
-                        <p className="text-sm font-medium text-slate-700">
+                        <p className="text-sm font-medium text-zinc-700">
                           {comp.address}
                         </p>
-                        <p className="text-xs text-slate-400">
+                        <p className="text-xs text-zinc-400">
                           {comp.beds}
                           {locale === "zh" ? "卧" : "bd"} ·{" "}
                           {comp.baths}
                           {locale === "zh" ? "浴" : "ba"} ·{" "}
-                          {comp.sqft.toLocaleString()} sqft
+                          <span className="font-mono-num">{comp.sqft.toLocaleString()}</span> sqft
                         </p>
                       </div>
-                      <span className="text-sm font-bold text-teal-700">
+                      <span className="text-sm font-bold text-zinc-800 font-mono-num">
                         {formatPrice(comp.price)}
                       </span>
-                      <span className="text-xs text-slate-400">
+                      <span className="text-xs text-zinc-400 font-mono-num">
                         {comp.date}
                       </span>
                     </div>
@@ -512,67 +534,71 @@ export default function HomePage() {
                 </div>
               </motion.div>
 
-              {/* Market Summary */}
-              <motion.div
-                className="report-card"
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.35 }}
-              >
-                <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                  <TrendingUp size={18} className="text-emerald-600" />
+              {/* Market Summary — clean typography, NO card box */}
+              <motion.div variants={staggerItem} className="section-divided">
+                <h3 className="heading-section text-base mb-3 flex items-center gap-2">
+                  <TrendingUp size={16} className="text-emerald-600" />
                   {t("report.marketTrend")}
                 </h3>
-                <p className="text-slate-600 text-sm leading-relaxed">
+                <p className="body-text text-sm mb-3">
                   {valuation.marketSummary}
                 </p>
-                <div className="mt-3">
-                  <span
-                    className={`stat-badge ${valuation.neighborhoodTrend === "rising" ? "positive" : "neutral"}`}
-                  >
-                    {t("report.trendLabel")}:{" "}
-                    {valuation.neighborhoodTrend === "rising"
-                      ? t("report.trend.rising")
-                      : valuation.neighborhoodTrend === "stable"
-                        ? t("report.trend.stable")
-                        : t("report.trend.declining")}
-                  </span>
-                </div>
+                <span
+                  className={`stat-pill ${valuation.neighborhoodTrend === "rising" ? "positive" : "neutral"}`}
+                >
+                  {valuation.neighborhoodTrend === "rising" ? (
+                    <TrendingUp size={14} />
+                  ) : valuation.neighborhoodTrend === "declining" ? (
+                    <TrendingDown size={14} />
+                  ) : (
+                    <Minus size={14} />
+                  )}
+                  {t("report.trendLabel")}:{" "}
+                  {valuation.neighborhoodTrend === "rising"
+                    ? t("report.trend.rising")
+                    : valuation.neighborhoodTrend === "stable"
+                      ? t("report.trend.stable")
+                      : t("report.trend.declining")}
+                </span>
               </motion.div>
 
-              {/* Share Buttons */}
-              <ShareButtons
-                address={submittedAddress}
-                estimatedValue={valuation.estimatedValue}
-                agentSlug={agentSlug}
-              />
+              {/* Share Buttons — section-divided */}
+              <motion.div variants={staggerItem} className="section-divided">
+                <ShareButtons
+                  address={submittedAddress}
+                  estimatedValue={valuation.estimatedValue}
+                  agentSlug={agentSlug}
+                />
+              </motion.div>
 
               {/* Pricing CTA */}
-              <PricingCTA />
+              <motion.div variants={staggerItem} className="section-divided">
+                <PricingCTA />
+              </motion.div>
 
               {/* New Valuation Button */}
-              <div className="text-center pt-4">
+              <motion.div variants={staggerItem} className="text-center pt-6 pb-4">
                 <button
                   onClick={resetAll}
-                  className="text-slate-400 hover:text-teal-600 text-sm transition-colors inline-flex items-center gap-2"
+                  className="text-zinc-400 hover:text-emerald-600 text-sm transition-colors inline-flex items-center gap-2"
                 >
                   <Search size={14} />
                   {t("report.newValuation")}
                 </button>
-              </div>
+              </motion.div>
             </motion.div>
           )}
         </AnimatePresence>
 
         {/* Footer */}
-        <footer className="text-center mt-10 sm:mt-16 pb-6 sm:pb-8 text-slate-400 text-xs">
+        <footer className="text-center mt-10 sm:mt-16 pb-6 sm:pb-8 text-zinc-400 text-xs">
           <p>{t("footer.disclaimer")}</p>
           <p className="mt-2 flex items-center justify-center gap-3">
-            <Link href="/privacy" className="hover:text-teal-600 transition-colors">
+            <Link href="/privacy" className="hover:text-emerald-600 transition-colors">
               Privacy Policy
             </Link>
-            <span>·</span>
-            <Link href="/pricing" className="hover:text-teal-600 transition-colors">
+            <span className="text-zinc-300">&middot;</span>
+            <Link href="/pricing" className="hover:text-emerald-600 transition-colors">
               For Agents
             </Link>
           </p>
